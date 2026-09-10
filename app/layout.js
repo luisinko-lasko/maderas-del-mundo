@@ -12,15 +12,16 @@ export default function RootLayout({ children }) {
       <body>
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Maderas del mundo, inicio">
-            <span className="brand-mark">MR</span>
+            <span className="brand-mark">MDM</span>
             <span className="brand-name">Maderas del mundo</span>
           </Link>
           <nav className="nav">
-            <Link href="/catalogo">Colección</Link>
-            <Link href="/about">About</Link>
+            <Link href="/catalogo">Catálogo</Link>
+            <Link href="/about">El proyecto</Link>
             <Link href="/tienda">Tienda</Link>
             <Link href="/coleccion">Mi colección</Link>
-            <Link href="/admin" className="nav-admin">Admin</Link>
+            <Link href="/login">Mi cuenta</Link>
+            <Link href="/carrito">Carrito</Link>
           </nav>
         </header>
         {children}
