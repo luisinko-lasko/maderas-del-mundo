@@ -1,5 +1,6 @@
 import './globals.css';
 import './mobile-menu.css';
+import './admin-mobile.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import MobileMenu from '../components/MobileMenu';
