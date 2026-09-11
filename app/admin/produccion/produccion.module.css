@@ -1,0 +1,282 @@
+.intro {
+  margin: 0.35rem 0 0;
+  color: #6f6a62;
+  line-height: 1.5;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 2.5rem 0 1rem;
+}
+
+.sectionHeader h2 {
+  margin: 0.25rem 0 0;
+}
+
+.orders {
+  display: grid;
+  gap: 1rem;
+}
+
+.orderCard {
+  border: 1px solid #e5e0d8;
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(55, 45, 35, 0.04);
+}
+
+.orderTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee9e2;
+}
+
+.orderTop p {
+  margin: 0.4rem 0 0;
+  color: #746f67;
+}
+
+.orderTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  font-size: 1.06rem;
+}
+
+.orderTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.orderTitle a:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badgePending {
+  background: #f4ead5;
+  color: #765317;
+}
+
+.badgeWorking {
+  background: #e5eee5;
+  color: #315a37;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.lines {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem 0;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 2fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.line > div:first-child {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.line > div:first-child span {
+  color: #777168;
+  font-size: 0.88rem;
+}
+
+.pieces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.piece {
+  display: inline-grid;
+  gap: 0.1rem;
+  min-width: 132px;
+  padding: 0.6rem 0.72rem;
+  border: 1px solid #ddd6cb;
+  border-radius: 10px;
+  background: #faf8f4;
+}
+
+.piece strong {
+  font-size: 0.92rem;
+}
+
+.piece small {
+  color: #706a61;
+  font-size: 0.76rem;
+}
+
+.noPiece {
+  color: #a03f32;
+  font-size: 0.9rem;
+}
+
+.orderFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #eee9e2;
+  color: #746f67;
+  font-size: 0.85rem;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 1.4rem;
+  border: 1px dashed #d9d2c7;
+  border-radius: 14px;
+  color: #756f66;
+  background: #fbfaf8;
+}
+
+.restockBlock {
+  margin-bottom: 2rem;
+}
+
+.limitControl {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #615c54;
+  font-size: 0.9rem;
+}
+
+.limitControl select {
+  min-width: 130px;
+}
+
+.restockGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.restockCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.05rem;
+  border: 1px solid #e4ded5;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.restockCard > div:first-child {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.restockCard em {
+  color: #7a746b;
+  font-size: 0.83rem;
+}
+
+.xilo {
+  color: #8b6b3f;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.stockNumber {
+  display: grid;
+  text-align: right;
+}
+
+.stockNumber strong {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.stockNumber span {
+  margin-top: 0.15rem;
+  color: #756f66;
+  font-size: 0.76rem;
+}
+
+.stockMeta {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid #eee9e2;
+  color: #777168;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 900px) {
+  .sectionHeader,
+  .orderTop {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+
+  .line {
+    grid-template-columns: 1fr;
+  }
+
+  .restockGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .orderCard {
+    padding: 1rem;
+  }
+
+  .actions {
+    display: grid;
+  }
+
+  .actions :global(.button) {
+    width: 100%;
+    text-align: center;
+  }
+
+  .orderFooter,
+  .stockMeta,
+  .limitControl {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .restockCard {
+    grid-template-columns: 1fr auto;
+  }
+}
