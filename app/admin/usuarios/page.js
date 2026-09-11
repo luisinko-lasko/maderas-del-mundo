@@ -14,6 +14,7 @@ export default function AdminUsuarios() {
   const [mensaje, setMensaje] = useState('');
   const [procesando, setProcesando] = useState(null);
   const [mostrarCrear, setMostrarCrear] = useState(false);
+  const [mostrarPasswordNueva, setMostrarPasswordNueva] = useState(false);
   const [nuevo, setNuevo] = useState({
     email: '',
     password: '',
@@ -77,6 +78,7 @@ export default function AdminUsuarios() {
     try {
       await llamarAdmin({ accion: 'crear', ...nuevo });
       setNuevo({ email: '', password: '', nombre: '', apellidos: '' });
+      setMostrarPasswordNueva(false);
       setMostrarCrear(false);
       setMensaje('Usuario creado correctamente.');
       await cargarUsuarios();
@@ -232,13 +234,35 @@ export default function AdminUsuarios() {
 
               <label>
                 Contraseña inicial
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={nuevo.password}
-                  onChange={(e) => setNuevo({ ...nuevo, password: e.target.value })}
-                />
+                <span style={{ position: 'relative', display: 'block' }}>
+                  <input
+                    type={mostrarPasswordNueva ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={nuevo.password}
+                    onChange={(e) => setNuevo({ ...nuevo, password: e.target.value })}
+                    style={{ paddingRight: '42px' }}
+                  />
+                  <button
+                    type="button"
+                    aria-label={mostrarPasswordNueva ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    title={mostrarPasswordNueva ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    onClick={() => setMostrarPasswordNueva(!mostrarPasswordNueva)}
+                    style={{
+                      position: 'absolute',
+                      right: '4px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      border: 0,
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      padding: '6px'
+                    }}
+                  >
+                    {mostrarPasswordNueva ? '◉' : '👁'}
+                  </button>
+                </span>
               </label>
 
               <label>
