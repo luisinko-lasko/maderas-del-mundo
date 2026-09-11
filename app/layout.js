@@ -1,6 +1,7 @@
 import './globals.css';
 import './mobile-menu.css';
 import Link from 'next/link';
+import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -11,6 +12,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
+        <AdminMenuEnhancer />
+
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Maderas del mundo, inicio">
             <span className="brand-mark">MDM</span>
