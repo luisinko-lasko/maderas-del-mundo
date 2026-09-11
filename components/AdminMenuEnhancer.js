@@ -13,27 +13,53 @@ export default function AdminMenuEnhancer() {
       const navs = document.querySelectorAll('.admin-side nav');
 
       navs.forEach((nav) => {
-        let link = nav.querySelector('a[href="/admin/produccion"]');
+        let catalogo = nav.querySelector(
+          'a[href="/admin/catalogo"], a[href="/catalogo"]'
+        );
 
-        if (!link) {
-          link = document.createElement('a');
-          link.href = '/admin/produccion';
-          link.textContent = 'Producción';
-          link.dataset.adminProduction = 'true';
+        if (!catalogo) {
+          catalogo = document.createElement('a');
+          catalogo.href = '/admin/catalogo';
+          catalogo.textContent = 'Catálogo';
+          catalogo.dataset.adminCatalog = 'true';
+
+          const inventario = nav.querySelector('a[href="/admin"]');
+          if (inventario?.nextSibling) {
+            nav.insertBefore(catalogo, inventario.nextSibling);
+          } else {
+            nav.appendChild(catalogo);
+          }
+        } else if (catalogo.getAttribute('href') === '/catalogo') {
+          catalogo.setAttribute('href', '/admin/catalogo');
+        }
+
+        if (pathname.startsWith('/admin/catalogo')) {
+          catalogo.classList.add('active');
+        } else {
+          catalogo.classList.remove('active');
+        }
+
+        let produccion = nav.querySelector('a[href="/admin/produccion"]');
+
+        if (!produccion) {
+          produccion = document.createElement('a');
+          produccion.href = '/admin/produccion';
+          produccion.textContent = 'Producción';
+          produccion.dataset.adminProduction = 'true';
 
           const pedidos = nav.querySelector('a[href="/admin/pedidos"]');
 
           if (pedidos) {
-            nav.insertBefore(link, pedidos);
+            nav.insertBefore(produccion, pedidos);
           } else {
-            nav.appendChild(link);
+            nav.appendChild(produccion);
           }
         }
 
         if (pathname.startsWith('/admin/produccion')) {
-          link.classList.add('active');
+          produccion.classList.add('active');
         } else {
-          link.classList.remove('active');
+          produccion.classList.remove('active');
         }
       });
     }
@@ -54,6 +80,10 @@ export default function AdminMenuEnhancer() {
 
       document
         .querySelectorAll('a[data-admin-production="true"]')
+        .forEach((link) => link.remove());
+
+      document
+        .querySelectorAll('a[data-admin-catalog="true"]')
         .forEach((link) => link.remove());
     };
   }, [pathname]);
