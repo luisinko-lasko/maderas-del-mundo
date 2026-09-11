@@ -2,6 +2,7 @@ import './globals.css';
 import './mobile-menu.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
+import MobileMenu from '../components/MobileMenu';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -29,17 +30,7 @@ export default function RootLayout({ children }) {
             <Link href="/carrito">Carrito</Link>
           </nav>
 
-          <details className="mobile-menu">
-            <summary aria-label="Abrir menú">Menú <span>☰</span></summary>
-            <nav>
-              <Link href="/catalogo">Catálogo</Link>
-              <Link href="/about">El proyecto</Link>
-              <Link href="/tienda">Tienda</Link>
-              <Link href="/coleccion">Mi colección</Link>
-              <Link href="/login">Mi cuenta</Link>
-              <Link href="/carrito">Carrito</Link>
-            </nav>
-          </details>
+          <MobileMenu />
         </header>
         {children}
         <footer className="footer">
