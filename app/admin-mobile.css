@@ -1,0 +1,71 @@
+@media (max-width: 900px) {
+  .admin-page {
+    display: block;
+    min-height: 100vh;
+  }
+
+  .admin-side {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    padding: 12px 14px 10px;
+    background: #1d211e;
+    overflow: hidden;
+  }
+
+  .admin-side .admin-logo {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 6px;
+  }
+
+  .admin-side > strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .admin-side nav {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    margin-top: 0;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .admin-side nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-side nav a,
+  .admin-side nav span {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 9px 11px;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .admin-side > a {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 28px 18px 60px;
+  }
+
+  .admin-top {
+    gap: 14px;
+  }
+
+  .admin-top h1 {
+    font-size: clamp(38px, 11vw, 56px);
+  }
+}
