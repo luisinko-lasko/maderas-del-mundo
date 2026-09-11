@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 export default function WoodTile({ madera }) {
   const tieneFoto = Boolean(madera.imagenUrl);
-  const esCirad =
+  const necesitaRecorte =
     tieneFoto &&
-    /Xyloth|Collection_de_bois|Cirad/i.test(madera.imagenUrl);
+    (/Xyloth|Collection_de_bois|Cirad/i.test(madera.imagenUrl) || madera.xiloId === 4);
 
   return (
     <Link href={`/catalogo/${madera.slug}`} className="wood-card">
@@ -19,7 +19,7 @@ export default function WoodTile({ madera }) {
               height: '100%',
               objectFit: 'cover',
               objectPosition: 'center',
-              transform: esCirad ? 'scale(1.34)' : 'none',
+              transform: necesitaRecorte ? 'scale(1.34)' : 'none',
               transformOrigin: 'center center',
             }}
           />
