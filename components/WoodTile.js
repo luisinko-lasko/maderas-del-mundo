@@ -2,6 +2,9 @@ import Link from 'next/link';
 
 export default function WoodTile({ madera }) {
   const tieneFoto = Boolean(madera.imagenUrl);
+  const esCirad =
+    tieneFoto &&
+    /Xyloth|Collection_de_bois|Cirad/i.test(madera.imagenUrl);
 
   return (
     <Link href={`/catalogo/${madera.slug}`} className="wood-card">
@@ -11,7 +14,14 @@ export default function WoodTile({ madera }) {
             src={madera.imagenUrl}
             alt={`Madera de ${madera.nombre}`}
             className="wood-photo"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              transform: esCirad ? 'scale(1.34)' : 'none',
+              transformOrigin: 'center center',
+            }}
           />
         )}
 
