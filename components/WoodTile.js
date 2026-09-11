@@ -11,6 +11,7 @@ export default function WoodTile({ madera }) {
             src={madera.imagenUrl}
             alt={`Madera de ${madera.nombre}`}
             className="wood-photo"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
         )}
 
