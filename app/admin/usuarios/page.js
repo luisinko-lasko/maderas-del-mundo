@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
+import styles from './usuarios.module.css';
 
 export default function AdminUsuarios() {
   const router = useRouter();
@@ -165,6 +166,14 @@ export default function AdminUsuarios() {
     }).format(Number(valor || 0));
   }
 
+  function iniciales(usuario) {
+    const nombre = [usuario.nombre, usuario.apellidos].filter(Boolean).join(' ').trim();
+    if (nombre) {
+      return nombre.split(/\s+/).slice(0, 2).map((p) => p[0]).join('');
+    }
+    return (usuario.email || '?').slice(0, 2);
+  }
+
   if (cargando) {
     return <main className="page-shell"><h1>Cargando usuarios…</h1></main>;
   }
@@ -184,84 +193,178 @@ export default function AdminUsuarios() {
         <Link href="/">← Web pública</Link>
       </aside>
 
-      <section className="admin-main">
-        <div className="admin-top">
+      <section className={`admin-main ${styles.shell}`}>
+        <div className={styles.header}>
           <div>
             <div className="page-eyebrow">Administración / Usuarios</div>
             <h1>Usuarios</h1>
+            <p>Gestiona las cuentas, los permisos de administrador y el acceso a la web desde un único sitio.</p>
           </div>
-          <button className="button dark" onClick={() => setMostrarCrear(!mostrarCrear)}>
-            {mostrarCrear ? 'Cancelar' : '+ Crear usuario'}
+
+          <button
+            className={styles.primaryButton}
+            onClick={() => setMostrarCrear(!mostrarCrear)}
+          >
+            {mostrarCrear ? 'Cerrar formulario' : '+ Crear usuario'}
           </button>
         </div>
 
-        {error && <p className="admin-error">{error}</p>}
-        {mensaje && <p className="login-message">{mensaje}</p>}
+        {error && <p className={styles.error}>{error}</p>}
+        {mensaje && <p className={styles.notice}>{mensaje}</p>}
 
         {mostrarCrear && (
-          <form className="account-card login-form" onSubmit={crearUsuario}>
-            <h2>Nuevo usuario</h2>
-            <label>Correo electrónico
-              <input type="email" required value={nuevo.email}
-                onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })} />
-            </label>
-            <label>Contraseña inicial
-              <input type="password" required minLength={8} value={nuevo.password}
-                onChange={(e) => setNuevo({ ...nuevo, password: e.target.value })} />
-            </label>
-            <label>Nombre
-              <input value={nuevo.nombre}
-                onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })} />
-            </label>
-            <label>Apellidos
-              <input value={nuevo.apellidos}
-                onChange={(e) => setNuevo({ ...nuevo, apellidos: e.target.value })} />
-            </label>
-            <button className="login-button" disabled={procesando === 'crear'}>
-              {procesando === 'crear' ? 'Creando…' : 'Crear usuario'}
-            </button>
+          <form className={styles.createPanel} onSubmit={crearUsuario}>
+            <div className={styles.createHead}>
+              <h2>Nuevo usuario</h2>
+              <span>La contraseña inicial debe tener al menos 8 caracteres.</span>
+            </div>
+
+            <div className={styles.createGrid}>
+              <label>
+                Correo electrónico
+                <input
+                  type="email"
+                  required
+                  value={nuevo.email}
+                  onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })}
+                />
+              </label>
+
+              <label>
+                Contraseña inicial
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={nuevo.password}
+                  onChange={(e) => setNuevo({ ...nuevo, password: e.target.value })}
+                />
+              </label>
+
+              <label>
+                Nombre
+                <input
+                  value={nuevo.nombre}
+                  onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })}
+                />
+              </label>
+
+              <label>
+                Apellidos
+                <input
+                  value={nuevo.apellidos}
+                  onChange={(e) => setNuevo({ ...nuevo, apellidos: e.target.value })}
+                />
+              </label>
+
+              <div className={styles.submitCell}>
+                <button
+                  className={styles.primaryButton}
+                  disabled={procesando === 'crear'}
+                >
+                  {procesando === 'crear' ? 'Creando…' : 'Crear'}
+                </button>
+              </div>
+            </div>
           </form>
         )}
 
-        <div className="admin-stats">
-          <div><span>Usuarios registrados</span><strong>{usuarios.length}</strong></div>
-          <div><span>Administradores</span><strong>{usuarios.filter(u => u.es_administrador).length}</strong></div>
-          <div><span>Con pedidos</span><strong>{usuarios.filter(u => Number(u.pedidos) > 0).length}</strong></div>
+        <div className={styles.stats}>
+          <div className={styles.stat}>
+            <span>Usuarios registrados</span>
+            <strong>{usuarios.length}</strong>
+          </div>
+          <div className={styles.stat}>
+            <span>Administradores</span>
+            <strong>{usuarios.filter((u) => u.es_administrador).length}</strong>
+          </div>
+          <div className={styles.stat}>
+            <span>Con pedidos</span>
+            <strong>{usuarios.filter((u) => Number(u.pedidos) > 0).length}</strong>
+          </div>
         </div>
 
-        <div className="inventory-summary">
-          <div className="inventory-summary-row inventory-summary-head">
-            <span>Usuario</span><span>Nombre</span><span>Rol</span><span>Pedidos</span>
-            <span>Total comprado</span><span>Alta</span><span>Acciones</span>
+        <section className={styles.directory}>
+          <div className={styles.directoryHead}>
+            <h2>Directorio</h2>
+            <span>{usuarios.length} {usuarios.length === 1 ? 'cuenta' : 'cuentas'}</span>
           </div>
 
-          {usuarios.map((usuario) => {
-            const nombreCompleto = [usuario.nombre, usuario.apellidos].filter(Boolean).join(' ') || '—';
+          <div className={styles.tableHead}>
+            <span>Usuario</span>
+            <span>Rol</span>
+            <span>Pedidos</span>
+            <span>Total comprado</span>
+            <span>Alta</span>
+            <span></span>
+          </div>
+
+          {usuarios.length === 0 ? (
+            <div className={styles.empty}>Todavía no hay usuarios registrados.</div>
+          ) : usuarios.map((usuario) => {
+            const nombreCompleto = [usuario.nombre, usuario.apellidos]
+              .filter(Boolean)
+              .join(' ') || 'Sin nombre';
+            const ubicacion = [usuario.poblacion, usuario.provincia]
+              .filter(Boolean)
+              .join(' · ');
             const ocupado = procesando === usuario.user_id;
 
             return (
-              <div className="inventory-summary-row" key={usuario.user_id}>
-                <span>
-                  <strong>{usuario.email}</strong>
-                  {usuario.poblacion && <em>{usuario.poblacion}{usuario.provincia ? ` · ${usuario.provincia}` : ''}</em>}
-                </span>
-                <span>{nombreCompleto}</span>
-                <span><strong>{usuario.es_administrador ? 'Administrador' : 'Usuario'}</strong></span>
-                <span>{usuario.pedidos}</span>
-                <span>{formatearPrecio(usuario.total_comprado)}</span>
-                <span>{formatearFecha(usuario.creado_en)}</span>
-                <span style={{ display: 'flex', gap: '.45rem', flexWrap: 'wrap' }}>
-                  <Link href={`/admin/usuarios/${usuario.user_id}`} className="button">Ver</Link>
-                  <button className="button" disabled={ocupado} onClick={() => forzarPassword(usuario)}>Contraseña</button>
-                  <button className="button" disabled={ocupado} onClick={() => cambiarAdmin(usuario)}>
-                    {usuario.es_administrador ? 'Quitar admin' : 'Hacer admin'}
-                  </button>
-                  <button className="button" disabled={ocupado} onClick={() => borrarUsuario(usuario)}>Borrar</button>
-                </span>
+              <div className={styles.row} key={usuario.user_id}>
+                <div className={styles.identity}>
+                  <div className={styles.avatar}>{iniciales(usuario)}</div>
+                  <div className={styles.identityText}>
+                    <strong>{usuario.email}</strong>
+                    <span>{nombreCompleto}{ubicacion ? ` · ${ubicacion}` : ''}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <span className={usuario.es_administrador ? styles.roleAdmin : styles.roleUser}>
+                    {usuario.es_administrador ? 'Administrador' : 'Usuario'}
+                  </span>
+                </div>
+
+                <span className={styles.numeric}>{usuario.pedidos}</span>
+                <span className={styles.numeric}>{formatearPrecio(usuario.total_comprado)}</span>
+                <span className={styles.date}>{formatearFecha(usuario.creado_en)}</span>
+
+                <details className={styles.actions}>
+                  <summary aria-label={`Acciones para ${usuario.email}`}>•••</summary>
+                  <div className={styles.menu}>
+                    <Link href={`/admin/usuarios/${usuario.user_id}`}>Ver ficha</Link>
+                    <button
+                      type="button"
+                      className={styles.menuButton}
+                      disabled={ocupado}
+                      onClick={() => forzarPassword(usuario)}
+                    >
+                      Forzar cambio de contraseña
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.menuButton}
+                      disabled={ocupado}
+                      onClick={() => cambiarAdmin(usuario)}
+                    >
+                      {usuario.es_administrador ? 'Quitar administrador' : 'Convertir en administrador'}
+                    </button>
+                    <div className={styles.menuDivider} />
+                    <button
+                      type="button"
+                      className={styles.dangerButton}
+                      disabled={ocupado}
+                      onClick={() => borrarUsuario(usuario)}
+                    >
+                      Borrar usuario
+                    </button>
+                  </div>
+                </details>
               </div>
             );
           })}
-        </div>
+        </section>
       </section>
     </main>
   );
