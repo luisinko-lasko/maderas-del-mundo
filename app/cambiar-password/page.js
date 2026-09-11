@@ -8,6 +8,8 @@ export default function CambiarPasswordPage() {
   const [lista, setLista] = useState(false);
   const [password, setPassword] = useState('');
   const [repetir, setRepetir] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [mostrarRepetir, setMostrarRepetir] = useState(false);
   const [mensaje, setMensaje] = useState('Comprobando enlace…');
   const [guardando, setGuardando] = useState(false);
   const [terminado, setTerminado] = useState(false);
@@ -71,6 +73,40 @@ export default function CambiarPasswordPage() {
     setGuardando(false);
   }
 
+  function campoPassword(valor, onChange, visible, setVisible, etiqueta) {
+    return (
+      <span style={{ position: 'relative', display: 'block' }}>
+        <input
+          type={visible ? 'text' : 'password'}
+          minLength={8}
+          required
+          value={valor}
+          onChange={onChange}
+          style={{ paddingRight: '46px' }}
+        />
+        <button
+          type="button"
+          aria-label={visible ? `Ocultar ${etiqueta}` : `Mostrar ${etiqueta}`}
+          title={visible ? `Ocultar ${etiqueta}` : `Mostrar ${etiqueta}`}
+          onClick={() => setVisible(!visible)}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            border: 0,
+            background: 'transparent',
+            cursor: 'pointer',
+            fontSize: '18px',
+            padding: '8px'
+          }}
+        >
+          {visible ? '◉' : '👁'}
+        </button>
+      </span>
+    );
+  }
+
   return (
     <main className="page-shell login-page">
       <div className="page-eyebrow">Mi cuenta</div>
@@ -80,24 +116,24 @@ export default function CambiarPasswordPage() {
         <form className="login-form" onSubmit={guardar}>
           <label>
             Nueva contraseña
-            <input
-              type="password"
-              minLength={8}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            {campoPassword(
+              password,
+              (e) => setPassword(e.target.value),
+              mostrarPassword,
+              setMostrarPassword,
+              'contraseña'
+            )}
           </label>
 
           <label>
             Repetir contraseña
-            <input
-              type="password"
-              minLength={8}
-              required
-              value={repetir}
-              onChange={(e) => setRepetir(e.target.value)}
-            />
+            {campoPassword(
+              repetir,
+              (e) => setRepetir(e.target.value),
+              mostrarRepetir,
+              setMostrarRepetir,
+              'contraseña repetida'
+            )}
           </label>
 
           <button className="login-button" disabled={guardando}>
