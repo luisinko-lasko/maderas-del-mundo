@@ -33,6 +33,36 @@ export async function POST(request) {
       );
     }
 
+    // Segunda vía de confirmación además del webhook.
+    // Si Stripe confirma que el pago está pagado, sincronizamos el pedido aquí también.
+    // La función de base de datos es idempotente, así que no pasa nada si el webhook
+    // ya lo había confirmado antes.
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
+        }
+      }
+    );
+
+    const { error: confirmacionError } = await supabaseAdmin.rpc(
+      'confirmar_pago_stripe',
+      {
+        p_pedido_id: pedidoId
+      }
+    );
+
+    if (confirmacionError) {
+      console.error('Error confirmando pedido tras volver de Stripe:', confirmacionError);
+      return NextResponse.json(
+        { error: 'El pago está confirmado en Stripe, pero no se pudo actualizar el pedido' },
+        { status: 500 }
+      );
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
