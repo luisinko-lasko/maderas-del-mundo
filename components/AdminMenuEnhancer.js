@@ -9,34 +9,49 @@ export default function AdminMenuEnhancer() {
   useEffect(() => {
     if (!pathname?.startsWith('/admin')) return;
 
-    const navs = document.querySelectorAll('.admin-side nav');
+    function actualizarMenus() {
+      const navs = document.querySelectorAll('.admin-side nav');
 
-    navs.forEach((nav) => {
-      let link = nav.querySelector('a[href="/admin/produccion"]');
+      navs.forEach((nav) => {
+        let link = nav.querySelector('a[href="/admin/produccion"]');
 
-      if (!link) {
-        link = document.createElement('a');
-        link.href = '/admin/produccion';
-        link.textContent = 'Producción';
-        link.dataset.adminProduction = 'true';
+        if (!link) {
+          link = document.createElement('a');
+          link.href = '/admin/produccion';
+          link.textContent = 'Producción';
+          link.dataset.adminProduction = 'true';
 
-        const inventario = nav.querySelector('a[href="/admin"]');
+          const pedidos = nav.querySelector('a[href="/admin/pedidos"]');
 
-        if (inventario?.nextSibling) {
-          nav.insertBefore(link, inventario.nextSibling);
-        } else {
-          nav.appendChild(link);
+          if (pedidos) {
+            nav.insertBefore(link, pedidos);
+          } else {
+            nav.appendChild(link);
+          }
         }
-      }
 
-      if (pathname.startsWith('/admin/produccion')) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
+        if (pathname.startsWith('/admin/produccion')) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    actualizarMenus();
+
+    const observer = new MutationObserver(() => {
+      actualizarMenus();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
 
     return () => {
+      observer.disconnect();
+
       document
         .querySelectorAll('a[data-admin-production="true"]')
         .forEach((link) => link.remove());
