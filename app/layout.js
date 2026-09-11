@@ -15,7 +15,8 @@ export default function RootLayout({ children }) {
             <span className="brand-mark">MDM</span>
             <span className="brand-name">Maderas del mundo</span>
           </Link>
-          <nav className="nav">
+
+          <nav className="nav desktop-nav">
             <Link href="/catalogo">Catálogo</Link>
             <Link href="/about">El proyecto</Link>
             <Link href="/tienda">Tienda</Link>
@@ -23,6 +24,18 @@ export default function RootLayout({ children }) {
             <Link href="/login">Mi cuenta</Link>
             <Link href="/carrito">Carrito</Link>
           </nav>
+
+          <details className="mobile-menu">
+            <summary aria-label="Abrir menú">Menú <span>☰</span></summary>
+            <nav>
+              <Link href="/catalogo">Catálogo</Link>
+              <Link href="/about">El proyecto</Link>
+              <Link href="/tienda">Tienda</Link>
+              <Link href="/coleccion">Mi colección</Link>
+              <Link href="/login">Mi cuenta</Link>
+              <Link href="/carrito">Carrito</Link>
+            </nav>
+          </details>
         </header>
         {children}
         <footer className="footer">
