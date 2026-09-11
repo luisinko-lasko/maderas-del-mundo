@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function AdminMenuEnhancer() {
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     if (!pathname?.startsWith('/admin')) return;
@@ -29,9 +30,9 @@ export default function AdminMenuEnhancer() {
           } else {
             nav.appendChild(catalogo);
           }
-        } else if (catalogo.getAttribute('href') === '/catalogo') {
-          catalogo.setAttribute('href', '/admin/catalogo');
         }
+
+        catalogo.setAttribute('href', '/admin/catalogo');
 
         if (pathname.startsWith('/admin/catalogo')) {
           catalogo.classList.add('active');
@@ -64,6 +65,22 @@ export default function AdminMenuEnhancer() {
       });
     }
 
+    function interceptarCatalogo(event) {
+      const enlace = event.target.closest?.('.admin-side nav a');
+      if (!enlace) return;
+
+      const texto = enlace.textContent?.trim().toLocaleLowerCase('es');
+      const href = enlace.getAttribute('href');
+
+      if (texto !== 'catálogo' && href !== '/catalogo' && href !== '/admin/catalogo') {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      router.push('/admin/catalogo');
+    }
+
     actualizarMenus();
 
     const observer = new MutationObserver(() => {
@@ -75,8 +92,11 @@ export default function AdminMenuEnhancer() {
       subtree: true
     });
 
+    document.addEventListener('click', interceptarCatalogo, true);
+
     return () => {
       observer.disconnect();
+      document.removeEventListener('click', interceptarCatalogo, true);
 
       document
         .querySelectorAll('a[data-admin-production="true"]')
@@ -86,7 +106,7 @@ export default function AdminMenuEnhancer() {
         .querySelectorAll('a[data-admin-catalog="true"]')
         .forEach((link) => link.remove());
     };
-  }, [pathname]);
+  }, [pathname, router]);
 
   return null;
 }
