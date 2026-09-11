@@ -17,6 +17,8 @@ export default function LoginPage() {
 
   const [password, setPassword] = useState('');
 
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+
   const [mensaje, setMensaje] = useState('');
 
   const [cargando, setCargando] = useState(true);
@@ -676,13 +678,35 @@ export default function LoginPage() {
 
           Contraseña
 
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
+          <span style={{ position: 'relative', display: 'block' }}>
+            <input
+              type={mostrarPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              style={{ paddingRight: '46px' }}
+            />
+            <button
+              type="button"
+              aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              title={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              onClick={() => setMostrarPassword(!mostrarPassword)}
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                border: 0,
+                background: 'transparent',
+                cursor: 'pointer',
+                fontSize: '18px',
+                padding: '8px'
+              }}
+            >
+              {mostrarPassword ? '◉' : '👁'}
+            </button>
+          </span>
 
         </label>
 
