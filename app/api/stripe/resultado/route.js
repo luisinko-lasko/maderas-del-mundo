@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { enviarConfirmacionPedido } from '../../../../lib/brevo';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -130,6 +131,28 @@ export async function POST(request) {
             'El pago está confirmado en Stripe, pero no se pudo actualizar el pedido'
         },
         { status: 500 }
+      );
+    }
+
+    // Enviamos también la confirmación desde esta vía de respaldo. La función
+    // de Brevo es idempotente, así que si el webhook ya la envió no se duplica.
+    try {
+      const email = await enviarConfirmacionPedido(
+        supabaseAdmin,
+        pedidoId
+      );
+
+      if (email.enviado) {
+        console.log('✓ Confirmación por email enviada desde resultado:', pedidoId);
+      } else {
+        console.log('ℹ Confirmación por email no enviada desde resultado:', pedidoId, email.motivo);
+      }
+    } catch (emailError) {
+      // El pago ya está confirmado: un fallo de correo no debe convertir la
+      // página de éxito en un error de pago. Queda registrado para diagnóstico.
+      console.error(
+        'Error enviando confirmación por email tras volver de Stripe:',
+        emailError
       );
     }
 
