@@ -66,6 +66,7 @@ export async function POST(request) {
         user_id,
         estado,
         total,
+        email_entrega,
         reserva_hasta,
         condiciones_aceptadas_at,
         condiciones_version,
@@ -204,6 +205,7 @@ export async function POST(request) {
       {
         mode: 'payment',
         line_items,
+        customer_email: pedido.email_entrega || user.email || undefined,
         expires_at: expiresAt,
 
         success_url:
