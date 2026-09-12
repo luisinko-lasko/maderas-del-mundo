@@ -58,6 +58,35 @@ export async function POST(request) {
           throw new Error('Stripe no devolvió pedido_id');
         }
 
+        const { data: pedido, error: pedidoError } = await supabaseAdmin
+          .from('pedidos')
+          .select('id, estado, stripe_checkout_session_id')
+          .eq('id', pedidoId)
+          .single();
+
+        if (pedidoError || !pedido) {
+          throw pedidoError || new Error('Pedido no encontrado');
+        }
+
+        if (
+          pedido.stripe_checkout_session_id &&
+          pedido.stripe_checkout_session_id !== session.id
+        ) {
+          throw new Error('La sesión Stripe no corresponde al pedido');
+        }
+
+        // En el improbable caso de que el pago termine antes de que la API
+        // haya guardado el ID de sesión, lo registramos desde el webhook firmado.
+        if (!pedido.stripe_checkout_session_id) {
+          const { error: registrarError } = await supabaseAdmin
+            .from('pedidos')
+            .update({ stripe_checkout_session_id: session.id })
+            .eq('id', pedidoId)
+            .eq('estado', 'pendiente_pago');
+
+          if (registrarError) throw registrarError;
+        }
+
         const { error } = await supabaseAdmin.rpc(
           'confirmar_pago_stripe',
           {
@@ -70,6 +99,38 @@ export async function POST(request) {
         }
 
         console.log('✓ Pedido pagado:', pedidoId);
+      }
+    }
+
+    if (evento.type === 'checkout.session.expired') {
+      const session = evento.data.object;
+      const pedidoId = session.metadata?.pedido_id;
+
+      if (pedidoId) {
+        // Solo caducamos si ESTA sigue siendo la sesión activa del pedido.
+        // Así un evento antiguo nunca puede liberar piezas de una sesión nueva.
+        const { data: actualizado, error: expirarError } = await supabaseAdmin
+          .from('pedidos')
+          .update({
+            reserva_hasta: new Date(Date.now() - 1000).toISOString()
+          })
+          .eq('id', pedidoId)
+          .eq('estado', 'pendiente_pago')
+          .eq('stripe_checkout_session_id', session.id)
+          .select('id')
+          .maybeSingle();
+
+        if (expirarError) throw expirarError;
+
+        if (actualizado) {
+          const { error: caducarError } = await supabaseAdmin.rpc(
+            'caducar_reservas_vencidas'
+          );
+
+          if (caducarError) throw caducarError;
+
+          console.log('✓ Reserva Stripe caducada:', pedidoId);
+        }
       }
     }
 
