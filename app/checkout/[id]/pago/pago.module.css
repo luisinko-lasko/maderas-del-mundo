@@ -1,0 +1,17 @@
+.acceptance {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.acceptance input {
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+
+.acceptance a {
+  color: inherit;
+  text-decoration: underline;
+}
