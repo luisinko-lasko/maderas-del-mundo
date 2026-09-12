@@ -18,11 +18,11 @@ export default function PrivacidadPage() {
       <div className={styles.summary}>
         <div>
           <span>Responsable</span>
-          <strong>Maderas Rodríguez · proyecto Maderas del Mundo</strong>
+          <strong>Luis Rodriguez · Maderas del Mundo</strong>
         </div>
         <div>
-          <span>Ámbito</span>
-          <strong>maderasdelmundo.es</strong>
+          <span>Contacto</span>
+          <strong>contacto@maderasdelmundo.es</strong>
         </div>
         <div>
           <span>Finalidades</span>
@@ -36,15 +36,16 @@ export default function PrivacidadPage() {
 
       <h2>1. Responsable del tratamiento</h2>
       <p>
-        El responsable del tratamiento de los datos recogidos a través de este sitio
-        es Maderas Rodríguez, responsable del proyecto Maderas del Mundo, con actividad
-        en Madrid, España.
+        El responsable del tratamiento de los datos recogidos a través de este sitio es
+        <strong> Luis Rodriguez</strong>, que desarrolla el proyecto y actividad bajo el
+        nombre comercial <strong>Maderas del Mundo</strong>.
       </p>
-      <div className={styles.pending}>
-        Antes de la apertura comercial se incorporará aquí el correo específico de
-        contacto para privacidad y el resto de datos identificativos legalmente exigibles
-        del responsable. No se publicará información personal inventada o incompleta.
-      </div>
+      <ul>
+        <li>NIF: 09754396G.</li>
+        <li>Domicilio: Gomeznarro 288, 28043 Madrid, España.</li>
+        <li>Correo electrónico: contacto@maderasdelmundo.es.</li>
+        <li>Sitio web: maderasdelmundo.es.</li>
+      </ul>
 
       <h2>2. Qué datos tratamos</h2>
       <ul>
@@ -90,9 +91,9 @@ export default function PrivacidadPage() {
       <h2>6. Proveedores y destinatarios</h2>
       <p>
         Para prestar el servicio utilizamos proveedores tecnológicos que pueden tratar
-        datos por cuenta de Maderas del Mundo, entre ellos Supabase para autenticación y
-        base de datos, Vercel para alojamiento de la aplicación, Stripe para pagos y Brevo
-        para la gestión de la newsletter y comunicaciones por correo.
+        datos por cuenta del responsable, entre ellos Supabase para autenticación y base
+        de datos, Vercel para alojamiento de la aplicación, Stripe para pagos y Brevo para
+        la gestión de la newsletter y comunicaciones por correo.
       </p>
       <p>
         No vendemos datos personales. Solo se comunicarán datos cuando sea necesario para
@@ -118,8 +119,9 @@ export default function PrivacidadPage() {
       <h2>9. Tus derechos</h2>
       <p>
         Puedes solicitar acceso a tus datos, rectificación, supresión, limitación del
-        tratamiento, portabilidad u oposición cuando corresponda. También puedes retirar
-        el consentimiento de la newsletter en cualquier momento, sin que ello afecte a la
+        tratamiento, portabilidad u oposición cuando corresponda escribiendo a
+        <strong> contacto@maderasdelmundo.es</strong>. También puedes retirar el
+        consentimiento de la newsletter en cualquier momento, sin que ello afecte a la
         licitud del tratamiento realizado con anterioridad.
       </p>
       <p>
