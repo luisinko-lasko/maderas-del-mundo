@@ -4,6 +4,35 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  }
+);
+
+function crearSupabaseUsuario(accessToken) {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    }
+  );
+}
+
 export async function POST(request) {
   try {
     const { sessionId, accessToken } = await request.json();
@@ -12,6 +41,20 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Faltan datos' },
         { status: 400 }
+      );
+    }
+
+    const supabase = crearSupabaseUsuario(accessToken);
+
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Sesión de usuario no válida' },
+        { status: 401 }
       );
     }
 
@@ -33,21 +76,41 @@ export async function POST(request) {
       );
     }
 
-    // Segunda vía de confirmación además del webhook.
-    // Si Stripe confirma que el pago está pagado, sincronizamos el pedido aquí también.
-    // La función de base de datos es idempotente, así que no pasa nada si el webhook
-    // ya lo había confirmado antes.
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false
-        }
-      }
-    );
+    if (session.metadata?.user_id && session.metadata.user_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Esta sesión de pago no pertenece al usuario' },
+        { status: 403 }
+      );
+    }
 
+    // Comprobamos la propiedad del pedido ANTES de ejecutar ninguna
+    // operación administrativa. RLS limita esta lectura al propio usuario.
+    const { data: pedidoPropio, error: pedidoPropioError } = await supabase
+      .from('pedidos')
+      .select('id, stripe_checkout_session_id')
+      .eq('id', pedidoId)
+      .single();
+
+    if (pedidoPropioError || !pedidoPropio) {
+      return NextResponse.json(
+        { error: 'No se pudo recuperar el pedido' },
+        { status: 404 }
+      );
+    }
+
+    if (
+      pedidoPropio.stripe_checkout_session_id &&
+      pedidoPropio.stripe_checkout_session_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'La sesión de pago no corresponde al pedido actual' },
+        { status: 400 }
+      );
+    }
+
+    // Segunda vía de confirmación además del webhook. La función de base
+    // de datos es idempotente, incluso si el pedido ya ha avanzado en
+    // preparación, envío o entrega.
     const { error: confirmacionError } = await supabaseAdmin.rpc(
       'confirmar_pago_stripe',
       {
@@ -56,24 +119,19 @@ export async function POST(request) {
     );
 
     if (confirmacionError) {
-      console.error('Error confirmando pedido tras volver de Stripe:', confirmacionError);
+      console.error(
+        'Error confirmando pedido tras volver de Stripe:',
+        confirmacionError
+      );
+
       return NextResponse.json(
-        { error: 'El pago está confirmado en Stripe, pero no se pudo actualizar el pedido' },
+        {
+          error:
+            'El pago está confirmado en Stripe, pero no se pudo actualizar el pedido'
+        },
         { status: 500 }
       );
     }
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        global: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        }
-      }
-    );
 
     const { data: pedido, error } = await supabase
       .from('pedidos')
