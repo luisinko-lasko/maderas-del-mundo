@@ -5,6 +5,19 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabase';
 
+const siguienteEstado = {
+  pagado: 'preparando',
+  preparando: 'enviado',
+  enviado: 'entregado'
+};
+
+const etiquetaEstado = {
+  pagado: 'Pagado',
+  preparando: 'Preparando',
+  enviado: 'Enviado',
+  entregado: 'Entregado'
+};
+
 export default function AdminPedidoDetalle() {
   const params = useParams();
   const router = useRouter();
@@ -45,9 +58,7 @@ export default function AdminPedidoDetalle() {
 
       const { data, error } = await supabase.rpc(
         'admin_detalle_pedido',
-        {
-          p_pedido_id: id
-        }
+        { p_pedido_id: id }
       );
 
       if (!activo) return;
@@ -88,6 +99,8 @@ export default function AdminPedidoDetalle() {
   }
 
   async function cambiarEstado(nuevoEstado) {
+    if (!nuevoEstado || nuevoEstado === datos?.pedido?.estado) return;
+
     setCambiando(true);
     setError(null);
 
@@ -124,12 +137,21 @@ export default function AdminPedidoDetalle() {
     );
   }
 
-  if (error || !datos) {
+  if (error && !datos) {
     return (
       <main className="page-shell">
         <Link href="/admin/pedidos">← Pedidos</Link>
         <h1>No se pudo cargar el pedido</h1>
-        {error && <p>{error}</p>}
+        <p>{error}</p>
+      </main>
+    );
+  }
+
+  if (!datos) {
+    return (
+      <main className="page-shell">
+        <Link href="/admin/pedidos">← Pedidos</Link>
+        <h1>No se pudo cargar el pedido</h1>
       </main>
     );
   }
@@ -138,79 +160,59 @@ export default function AdminPedidoDetalle() {
   const usuario = datos.usuario || {};
   const perfil = datos.perfil || {};
   const lineas = datos.lineas || [];
+  const siguiente = siguienteEstado[pedido.estado];
 
   return (
     <main className="admin-page">
-
       <aside className="admin-side">
-
-        <div className="brand-mark admin-logo">
-          MDM
-        </div>
-
+        <div className="brand-mark admin-logo">MDM</div>
         <strong>Administración</strong>
 
         <nav>
           <Link href="/admin">Inventario</Link>
-          <Link href="/catalogo">Catálogo</Link>
+          <Link href="/admin/catalogo">Catálogo</Link>
           <Link href="/admin/series">Series</Link>
-          <Link href="/admin/pedidos" className="active">
-            Pedidos
-          </Link>
+          <Link href="/admin/pedidos" className="active">Pedidos</Link>
           <Link href="/admin/usuarios">Usuarios</Link>
         </nav>
 
         <Link href="/">← Web pública</Link>
-
       </aside>
 
       <section className="admin-main">
-
         <div className="admin-top">
-
           <div>
-            <div className="page-eyebrow">
-              Administración / Pedido
-            </div>
-
-            <h1>
-              Pedido {pedido.id?.slice(0, 8)}
-            </h1>
-
-            <p>
-              {fecha(pedido.created_at)}
-            </p>
+            <div className="page-eyebrow">Administración / Pedido</div>
+            <h1>Pedido {pedido.id?.slice(0, 8)}</h1>
+            <p>{fecha(pedido.created_at)}</p>
           </div>
 
-          <Link
-            href="/admin/pedidos"
-            className="button"
-          >
+          <Link href="/admin/pedidos" className="button">
             ← Volver
           </Link>
-
         </div>
 
-        <div className="admin-stats">
+        {error && <p className="admin-error">{error}</p>}
 
+        <div className="admin-stats">
           <div>
             <span>Estado</span>
 
-            {['pagado', 'preparando', 'enviado', 'entregado'].includes(
-              pedido.estado
-            ) ? (
+            {siguiente ? (
               <select
                 value={pedido.estado}
                 disabled={cambiando}
                 onChange={e => cambiarEstado(e.target.value)}
               >
-                <option value="pagado">Pagado</option>
-                <option value="preparando">Preparando</option>
-                <option value="enviado">Enviado</option>
-                <option value="entregado">Entregado</option>
+                <option value={pedido.estado}>
+                  {etiquetaEstado[pedido.estado] || pedido.estado}
+                </option>
+                <option value={siguiente}>
+                  → {etiquetaEstado[siguiente] || siguiente}
+                </option>
               </select>
             ) : (
-              <strong>{pedido.estado}</strong>
+              <strong>{etiquetaEstado[pedido.estado] || pedido.estado}</strong>
             )}
           </div>
 
@@ -221,19 +223,13 @@ export default function AdminPedidoDetalle() {
 
           <div>
             <span>Entrega</span>
-            <strong>
-              {pedido.entrega || '—'}
-            </strong>
+            <strong>{pedido.entrega || '—'}</strong>
           </div>
-
         </div>
 
         <div className="account-grid">
-
           <section className="account-card">
-            <span className="account-label">
-              Cliente
-            </span>
+            <span className="account-label">Cliente</span>
 
             <strong>
               {pedido.nombre_entrega ||
@@ -242,37 +238,23 @@ export default function AdminPedidoDetalle() {
                '—'}
             </strong>
 
-            {(pedido.apellidos_entrega ||
-              perfil.apellidos) && (
-              <span>
-                {pedido.apellidos_entrega ||
-                 perfil.apellidos}
-              </span>
+            {(pedido.apellidos_entrega || perfil.apellidos) && (
+              <span>{pedido.apellidos_entrega || perfil.apellidos}</span>
             )}
 
             <span>
-              {pedido.email_entrega ||
-               usuario.email ||
-               '—'}
+              {pedido.email_entrega || usuario.email || '—'}
             </span>
 
-            {(pedido.telefono_entrega ||
-              perfil.telefono) && (
-              <span>
-                {pedido.telefono_entrega ||
-                 perfil.telefono}
-              </span>
+            {(pedido.telefono_entrega || perfil.telefono) && (
+              <span>{pedido.telefono_entrega || perfil.telefono}</span>
             )}
           </section>
 
           <section className="account-card">
-            <span className="account-label">
-              Dirección
-            </span>
+            <span className="account-label">Dirección</span>
 
-            <strong>
-              {pedido.direccion_entrega || '—'}
-            </strong>
+            <strong>{pedido.direccion_entrega || '—'}</strong>
 
             <span>
               {pedido.codigo_postal_entrega || ''}{' '}
@@ -287,22 +269,13 @@ export default function AdminPedidoDetalle() {
               <span>{pedido.pais_entrega}</span>
             )}
           </section>
-
         </div>
 
-        <div className="page-eyebrow">
-          Contenido del pedido
-        </div>
+        <div className="page-eyebrow">Contenido del pedido</div>
 
         <div className="collection-list">
-
           {lineas.map(linea => (
-
-            <div
-              className="collection-row"
-              key={linea.id}
-            >
-
+            <div className="collection-row" key={linea.id}>
               <div>
                 <strong>{linea.nombre}</strong>
                 <em>{linea.tipo}</em>
@@ -314,8 +287,7 @@ export default function AdminPedidoDetalle() {
 
               <strong>
                 {precio(
-                  Number(linea.cantidad) *
-                  Number(linea.precio_unitario)
+                  Number(linea.cantidad) * Number(linea.precio_unitario)
                 )}
               </strong>
 
@@ -334,15 +306,10 @@ export default function AdminPedidoDetalle() {
                   ))
                 )}
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </section>
-
     </main>
   );
 }
