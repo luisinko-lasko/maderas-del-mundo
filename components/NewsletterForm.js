@@ -74,7 +74,9 @@ export default function NewsletterForm() {
         />
         <span>
           Quiero recibir comunicaciones de Maderas del Mundo por correo electrónico.
-          Puedo darme de baja en cualquier momento. Consulta la{' '}
+          Responsable: Luis Rodriguez. Finalidad: envío de novedades del proyecto.
+          La base jurídica es mi consentimiento y puedo retirarlo en cualquier momento.
+          Más información y derechos en la{' '}
           <Link href="/privacidad">política de privacidad</Link>.
         </span>
       </label>
