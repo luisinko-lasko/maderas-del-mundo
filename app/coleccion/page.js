@@ -36,6 +36,8 @@ export default function Coleccion() {
             xilo_id,
             nombre,
             nombre_cientifico,
+            densidad_seco_15,
+            janka_lbf,
             slug,
             imagen_url
           )
@@ -79,6 +81,18 @@ export default function Coleccion() {
         resultado =
           (Number.isFinite(xiloA) ? xiloA : Number.MAX_SAFE_INTEGER) -
           (Number.isFinite(xiloB) ? xiloB : Number.MAX_SAFE_INTEGER);
+      } else if (criterioOrden === 'densidad') {
+        const densidadA = Number(maderaA.densidad_seco_15);
+        const densidadB = Number(maderaB.densidad_seco_15);
+        resultado =
+          (Number.isFinite(densidadA) ? densidadA : Number.MAX_SAFE_INTEGER) -
+          (Number.isFinite(densidadB) ? densidadB : Number.MAX_SAFE_INTEGER);
+      } else if (criterioOrden === 'dureza') {
+        const durezaA = Number(maderaA.janka_lbf);
+        const durezaB = Number(maderaB.janka_lbf);
+        resultado =
+          (Number.isFinite(durezaA) ? durezaA : Number.MAX_SAFE_INTEGER) -
+          (Number.isFinite(durezaB) ? durezaB : Number.MAX_SAFE_INTEGER);
       } else if (criterioOrden === 'cientifico') {
         resultado = String(maderaA.nombre_cientifico || '').localeCompare(
           String(maderaB.nombre_cientifico || ''),
@@ -105,13 +119,15 @@ export default function Coleccion() {
     setDireccionOrden(nuevoCriterio === 'fecha' ? 'desc' : 'asc');
   }
 
+  const esOrdenNumerico = ['xilo', 'densidad', 'dureza'].includes(criterioOrden);
+
   const opcionesDireccion =
     criterioOrden === 'fecha'
       ? [
           ['desc', 'Más recientes primero'],
           ['asc', 'Más antiguas primero']
         ]
-      : criterioOrden === 'xilo'
+      : esOrdenNumerico
         ? [
             ['asc', 'Menor a mayor'],
             ['desc', 'Mayor a menor']
@@ -187,6 +203,8 @@ export default function Coleccion() {
               <option value="xilo">Nº Xilo</option>
               <option value="nombre">Nombre</option>
               <option value="cientifico">Nombre científico</option>
+              <option value="densidad">Densidad</option>
+              <option value="dureza">Dureza (Janka)</option>
             </select>
           </div>
 
