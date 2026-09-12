@@ -41,8 +41,6 @@ export default function PrivacidadPage() {
         nombre comercial <strong>Maderas del Mundo</strong>.
       </p>
       <ul>
-        <li>NIF: 09754396G.</li>
-        <li>Domicilio: Gomeznarro 288, 28043 Madrid, España.</li>
         <li>Correo electrónico: contacto@maderasdelmundo.es.</li>
         <li>Sitio web: maderasdelmundo.es.</li>
       </ul>
