@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { CONDICIONES_COMPRA_VERSION } from '../../../../lib/legal';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -66,6 +67,8 @@ export async function POST(request) {
         estado,
         total,
         reserva_hasta,
+        condiciones_aceptadas_at,
+        condiciones_version,
         stripe_checkout_session_id,
         stripe_checkout_expires_at,
         pedido_lineas (
@@ -104,6 +107,16 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { error: 'La reserva ha caducado' },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !pedido.condiciones_aceptadas_at ||
+      pedido.condiciones_version !== CONDICIONES_COMPRA_VERSION
+    ) {
+      return NextResponse.json(
+        { error: 'Debes aceptar las condiciones de compra antes de pagar' },
         { status: 400 }
       );
     }
@@ -201,7 +214,8 @@ export async function POST(request) {
 
         metadata: {
           pedido_id: pedido.id,
-          user_id: user.id
+          user_id: user.id,
+          condiciones_version: CONDICIONES_COMPRA_VERSION
         }
       },
       {
