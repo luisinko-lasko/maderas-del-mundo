@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import styles from './coleccion.module.css';
 
 export default function Coleccion() {
   const [user, setUser] = useState(null);
   const [maderas, setMaderas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [criterioOrden, setCriterioOrden] = useState('fecha');
+  const [direccionOrden, setDireccionOrden] = useState('desc');
 
   useEffect(() => {
     async function cargarColeccion() {
@@ -52,6 +55,71 @@ export default function Coleccion() {
 
     cargarColeccion();
   }, []);
+
+  const maderasOrdenadas = useMemo(() => {
+    const copia = [...maderas];
+    const factor = direccionOrden === 'asc' ? 1 : -1;
+
+    copia.sort((a, b) => {
+      const maderaA = a.madera || {};
+      const maderaB = b.madera || {};
+      let resultado = 0;
+
+      if (criterioOrden === 'fecha') {
+        const fechaA = a.fecha_adquisicion
+          ? new Date(a.fecha_adquisicion).getTime()
+          : 0;
+        const fechaB = b.fecha_adquisicion
+          ? new Date(b.fecha_adquisicion).getTime()
+          : 0;
+        resultado = fechaA - fechaB;
+      } else if (criterioOrden === 'xilo') {
+        const xiloA = Number(maderaA.xilo_id);
+        const xiloB = Number(maderaB.xilo_id);
+        resultado =
+          (Number.isFinite(xiloA) ? xiloA : Number.MAX_SAFE_INTEGER) -
+          (Number.isFinite(xiloB) ? xiloB : Number.MAX_SAFE_INTEGER);
+      } else if (criterioOrden === 'cientifico') {
+        resultado = String(maderaA.nombre_cientifico || '').localeCompare(
+          String(maderaB.nombre_cientifico || ''),
+          'es',
+          { sensitivity: 'base' }
+        );
+      } else {
+        resultado = String(maderaA.nombre || '').localeCompare(
+          String(maderaB.nombre || ''),
+          'es',
+          { sensitivity: 'base' }
+        );
+      }
+
+      return resultado * factor;
+    });
+
+    return copia;
+  }, [maderas, criterioOrden, direccionOrden]);
+
+  function cambiarCriterio(event) {
+    const nuevoCriterio = event.target.value;
+    setCriterioOrden(nuevoCriterio);
+    setDireccionOrden(nuevoCriterio === 'fecha' ? 'desc' : 'asc');
+  }
+
+  const opcionesDireccion =
+    criterioOrden === 'fecha'
+      ? [
+          ['desc', 'Más recientes primero'],
+          ['asc', 'Más antiguas primero']
+        ]
+      : criterioOrden === 'xilo'
+        ? [
+            ['asc', 'Menor a mayor'],
+            ['desc', 'Mayor a menor']
+          ]
+        : [
+            ['asc', 'A → Z'],
+            ['desc', 'Z → A']
+          ];
 
   if (cargando) {
     return (
@@ -106,6 +174,39 @@ export default function Coleccion() {
         </div>
       </div>
 
+      {maderas.length > 1 && (
+        <div className={styles.sortBar}>
+          <div className={styles.sortField}>
+            <label htmlFor="criterio-orden">Ordenar por</label>
+            <select
+              id="criterio-orden"
+              value={criterioOrden}
+              onChange={cambiarCriterio}
+            >
+              <option value="fecha">Fecha de incorporación</option>
+              <option value="xilo">Nº Xilo</option>
+              <option value="nombre">Nombre</option>
+              <option value="cientifico">Nombre científico</option>
+            </select>
+          </div>
+
+          <div className={styles.sortField}>
+            <label htmlFor="direccion-orden">Orden</label>
+            <select
+              id="direccion-orden"
+              value={direccionOrden}
+              onChange={(event) => setDireccionOrden(event.target.value)}
+            >
+              {opcionesDireccion.map(([valor, etiqueta]) => (
+                <option value={valor} key={valor}>
+                  {etiqueta}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
       {maderas.length === 0 ? (
         <div className="collection-empty">
           <h2>Tu colección está vacía</h2>
@@ -114,7 +215,7 @@ export default function Coleccion() {
         </div>
       ) : (
         <div className="collection-list">
-          {maderas.map((item) => {
+          {maderasOrdenadas.map((item) => {
             const m = item.madera;
 
             if (!m) return null;
