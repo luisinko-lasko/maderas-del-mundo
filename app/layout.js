@@ -4,6 +4,7 @@ import './admin-mobile.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import MobileMenu from '../components/MobileMenu';
+import NewsletterForm from '../components/NewsletterForm';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -11,6 +12,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const newsletterEnabled = Boolean(
+    process.env.BREVO_API_KEY &&
+    process.env.BREVO_LIST_ID &&
+    process.env.BREVO_DOI_TEMPLATE_ID
+  );
+
   return (
     <html lang="es">
       <body>
@@ -35,8 +42,18 @@ export default function RootLayout({ children }) {
         </header>
         {children}
         <footer className="footer">
-          <div><strong>Maderas del mundo</strong><br/>Una colección material del mundo.</div>
-          <div className="footer-meta">Madrid · Proyecto 2026<br/>Primera versión de trabajo</div>
+          <div>
+            <strong>Maderas del mundo</strong><br/>
+            Una colección material del mundo.
+          </div>
+
+          {newsletterEnabled && <NewsletterForm />}
+
+          <div className="footer-meta">
+            Madrid · Proyecto 2026<br/>
+            <Link href="/privacidad">Política de privacidad</Link><br/>
+            Primera versión de trabajo
+          </div>
         </footer>
       </body>
     </html>
