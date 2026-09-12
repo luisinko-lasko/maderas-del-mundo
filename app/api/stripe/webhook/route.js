@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { enviarConfirmacionPedido } from '../../../../lib/brevo';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -96,6 +97,17 @@ export async function POST(request) {
 
         if (error) {
           throw error;
+        }
+
+        const email = await enviarConfirmacionPedido(
+          supabaseAdmin,
+          pedidoId
+        );
+
+        if (email.enviado) {
+          console.log('✓ Confirmación por email enviada:', pedidoId);
+        } else if (email.motivo === 'brevo_no_configurado') {
+          console.log('ℹ Brevo todavía no configurado; email pendiente:', pedidoId);
         }
 
         console.log('✓ Pedido pagado:', pedidoId);
