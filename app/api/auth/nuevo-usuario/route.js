@@ -49,12 +49,23 @@ export async function POST(request) {
       );
     }
 
-    const creado = new Date(usuario.created_at).getTime();
-    const antiguedad = Date.now() - creado;
-
-    if (!Number.isFinite(creado) || antiguedad < -60_000 || antiguedad > 15 * 60_000) {
+    if (!usuario.email_confirmed_at) {
       return NextResponse.json(
-        { error: 'El usuario no es un alta reciente' },
+        { error: 'El usuario todavía no ha confirmado el correo' },
+        { status: 409 }
+      );
+    }
+
+    const confirmadoEn = new Date(usuario.email_confirmed_at).getTime();
+    const antiguedadConfirmacion = Date.now() - confirmadoEn;
+
+    if (
+      !Number.isFinite(confirmadoEn) ||
+      antiguedadConfirmacion < -60_000 ||
+      antiguedadConfirmacion > 15 * 60_000
+    ) {
+      return NextResponse.json(
+        { error: 'La confirmación no es reciente' },
         { status: 403 }
       );
     }
@@ -72,29 +83,34 @@ export async function POST(request) {
       );
     }
 
-    const confirmado = Boolean(usuario.email_confirmed_at);
-    const fecha = new Intl.DateTimeFormat('es-ES', {
+    const fechaAlta = new Intl.DateTimeFormat('es-ES', {
       dateStyle: 'medium',
       timeStyle: 'short',
       timeZone: 'Europe/Madrid'
     }).format(new Date(usuario.created_at));
+
+    const fechaConfirmacion = new Intl.DateTimeFormat('es-ES', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: 'Europe/Madrid'
+    }).format(new Date(usuario.email_confirmed_at));
 
     const htmlContent = `<!doctype html>
 <html lang="es">
   <body style="margin:0;background:#f2f0e9;color:#161714;font-family:Arial,Helvetica,sans-serif;">
     <div style="max-width:640px;margin:0 auto;padding:40px 24px;">
       <p style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6f7069;">Maderas del Mundo</p>
-      <h1 style="font-family:Georgia,serif;font-weight:400;font-size:32px;margin:12px 0 24px;">Nuevo usuario registrado</h1>
-      <p>Se ha creado una nueva cuenta en la web.</p>
+      <h1 style="font-family:Georgia,serif;font-weight:400;font-size:32px;margin:12px 0 24px;">Nuevo usuario confirmado</h1>
+      <p>Un nuevo usuario ha confirmado su dirección de correo y ya tiene la cuenta activa.</p>
       <p><strong>Correo:</strong> ${escaparHtml(usuario.email)}</p>
-      <p><strong>Fecha:</strong> ${escaparHtml(fecha)}</p>
-      <p><strong>Estado:</strong> ${confirmado ? 'correo confirmado' : 'pendiente de confirmar el correo'}</p>
+      <p><strong>Alta:</strong> ${escaparHtml(fechaAlta)}</p>
+      <p><strong>Confirmación:</strong> ${escaparHtml(fechaConfirmacion)}</p>
       <p style="margin-top:32px;font-size:12px;color:#6f7069;">ID de usuario: ${escaparHtml(usuario.id)}</p>
     </div>
   </body>
 </html>`;
 
-    const textContent = `Nuevo usuario registrado en Maderas del Mundo\n\nCorreo: ${usuario.email}\nFecha: ${fecha}\nEstado: ${confirmado ? 'correo confirmado' : 'pendiente de confirmar el correo'}\nID: ${usuario.id}`;
+    const textContent = `Nuevo usuario confirmado en Maderas del Mundo\n\nCorreo: ${usuario.email}\nAlta: ${fechaAlta}\nConfirmación: ${fechaConfirmacion}\nID: ${usuario.id}`;
 
     const respuesta = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -117,10 +133,10 @@ export async function POST(request) {
         replyTo: {
           email: usuario.email
         },
-        subject: `Nuevo usuario registrado · ${usuario.email}`,
+        subject: `Nuevo usuario confirmado · ${usuario.email}`,
         htmlContent,
         textContent,
-        tags: ['nuevo-usuario']
+        tags: ['nuevo-usuario-confirmado']
       }),
       cache: 'no-store'
     });
