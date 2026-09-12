@@ -23,6 +23,8 @@ export default function LoginPage() {
 
   const [cargando, setCargando] = useState(true);
 
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+
   const [totalMaderas, setTotalMaderas] = useState(0);
 
   const [perfil, setPerfil] = useState({
@@ -167,9 +169,22 @@ export default function LoginPage() {
 
     setMensaje('');
 
-    const { error } = await supabase.auth.signUp({
+    if (!email) {
+      setMensaje('Escribe tu correo electrónico.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setMensaje('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/login`
+      }
     });
 
     if (error) {
@@ -180,7 +195,13 @@ export default function LoginPage() {
 
     }
 
-    setMensaje('Cuenta creada correctamente.');
+    if (data?.session) {
+      setMensaje('Cuenta creada correctamente.');
+    } else {
+      setMensaje(
+        'Te hemos enviado un correo para confirmar tu cuenta. Abre el enlace del mensaje antes de iniciar sesión.'
+      );
+    }
 
   }
 
@@ -198,13 +219,46 @@ export default function LoginPage() {
 
     if (error) {
 
-      setMensaje(error.message);
+      if (error.code === 'email_not_confirmed') {
+        setMensaje('Debes confirmar tu correo electrónico antes de entrar.');
+      } else {
+        setMensaje(error.message);
+      }
 
       return;
 
     }
 
     setMensaje('');
+
+  }
+
+
+  async function recuperarPassword() {
+
+    setMensaje('');
+
+    if (!email) {
+      setMensaje('Escribe primero el correo electrónico de tu cuenta.');
+      return;
+    }
+
+    setEnviandoRecuperacion(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/cambiar-password`
+    });
+
+    setEnviandoRecuperacion(false);
+
+    if (error) {
+      setMensaje(error.message);
+      return;
+    }
+
+    setMensaje(
+      'Si existe una cuenta con ese correo, recibirás un enlace para cambiar la contraseña.'
+    );
 
   }
 
@@ -684,7 +738,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               style={{ paddingRight: '46px' }}
             />
             <button
@@ -735,6 +789,18 @@ export default function LoginPage() {
           </button>
 
         </div>
+
+        <button
+          type="button"
+          className="button"
+          onClick={recuperarPassword}
+          disabled={enviandoRecuperacion}
+          style={{ alignSelf: 'flex-start' }}
+        >
+          {enviandoRecuperacion
+            ? 'Enviando…'
+            : 'He olvidado mi contraseña'}
+        </button>
 
       </form>
 
