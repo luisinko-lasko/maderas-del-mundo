@@ -52,6 +52,7 @@ export default function RootLayout({ children }) {
 
           <div className="footer-meta">
             Madrid · Proyecto 2026<br/>
+            <Link href="/condiciones-compra">Condiciones de compra</Link><br/>
             <Link href="/aviso-legal">Aviso legal</Link><br/>
             <Link href="/privacidad">Política de privacidad</Link><br/>
             Primera versión de trabajo
