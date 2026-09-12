@@ -1,0 +1,54 @@
+.sortBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 18px;
+  margin: -3vh 0 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sortField {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sortField label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  color: var(--muted);
+}
+
+.sortField select {
+  min-width: 190px;
+  padding: 10px 34px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sortField select:focus {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .sortBar {
+    justify-content: stretch;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: -2vh;
+  }
+
+  .sortField select {
+    width: 100%;
+    min-width: 0;
+  }
+}
