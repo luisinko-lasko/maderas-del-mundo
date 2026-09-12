@@ -122,6 +122,8 @@ export async function POST(request) {
       );
     }
 
+    const emailCliente = pedido.email_entrega || user.email || undefined;
+
     async function prepararPago() {
       const { data, error } = await supabase.rpc(
         'preparar_checkout_stripe',
@@ -137,6 +139,20 @@ export async function POST(request) {
       }
 
       return preparacion;
+    }
+
+    async function limpiarSesionStripe(sessionId) {
+      const { error: limpiarError } = await supabaseAdmin
+        .from('pedidos')
+        .update({
+          stripe_checkout_session_id: null,
+          stripe_checkout_expires_at: null
+        })
+        .eq('id', pedido.id)
+        .eq('estado', 'pendiente_pago')
+        .eq('stripe_checkout_session_id', sessionId);
+
+      if (limpiarError) throw limpiarError;
     }
 
     let preparacion = await prepararPago();
@@ -161,22 +177,20 @@ export async function POST(request) {
       }
 
       if (existente.status === 'open' && existente.url) {
-        return NextResponse.json({ url: existente.url });
-      }
+        const emailSesion = existente.customer_email?.trim().toLowerCase() || null;
+        const emailEsperado = emailCliente?.trim().toLowerCase() || null;
 
-      if (existente.status === 'expired') {
-        const { error: limpiarError } = await supabaseAdmin
-          .from('pedidos')
-          .update({
-            stripe_checkout_session_id: null,
-            stripe_checkout_expires_at: null
-          })
-          .eq('id', pedido.id)
-          .eq('estado', 'pendiente_pago')
-          .eq('stripe_checkout_session_id', existente.id);
+        if (emailEsperado && emailSesion === emailEsperado) {
+          return NextResponse.json({ url: existente.url });
+        }
 
-        if (limpiarError) throw limpiarError;
-
+        // Las sesiones creadas antes de pasar customer_email se reutilizaban
+        // y seguían pidiendo el correo en Stripe. Las caducamos y creamos otra.
+        await stripe.checkout.sessions.expire(existente.id);
+        await limpiarSesionStripe(existente.id);
+        preparacion = await prepararPago();
+      } else if (existente.status === 'expired') {
+        await limpiarSesionStripe(existente.id);
         preparacion = await prepararPago();
       } else {
         return NextResponse.json(
@@ -205,7 +219,7 @@ export async function POST(request) {
       {
         mode: 'payment',
         line_items,
-        customer_email: pedido.email_entrega || user.email || undefined,
+        customer_email: emailCliente,
         expires_at: expiresAt,
 
         success_url:
@@ -221,7 +235,7 @@ export async function POST(request) {
         }
       },
       {
-        idempotencyKey: `pedido-${pedido.id}-${expiresAt}`
+        idempotencyKey: `pedido-${pedido.id}-${expiresAt}-email-v1`
       }
     );
 
