@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../../lib/supabase';
 import { borrarPedidoActivo } from '../../../../lib/carrito';
+import { CONDICIONES_COMPRA_VERSION } from '../../../../lib/legal';
 
 export default function PagoPage() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function PagoPage() {
   const [lineas, setLineas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [pagando, setPagando] = useState(false);
+  const [condicionesAceptadas, setCondicionesAceptadas] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -44,9 +46,6 @@ export default function PagoPage() {
         !pedidoData.reserva_hasta ||
         new Date(pedidoData.reserva_hasta) <= new Date();
 
-      // Un pedido todavía "reservado" no ha pasado por el formulario de
-      // entrega/contacto. Lo devolvemos a ese paso en lugar de dejar que
-      // llegue directamente a Stripe.
       if (pedidoData.estado === 'reservado' && !reservaVencida) {
         router.replace(`/checkout/${id}`);
         return;
@@ -78,6 +77,12 @@ export default function PagoPage() {
 
       setPedido(pedidoData);
       setLineas(lineasData || []);
+      setCondicionesAceptadas(
+        Boolean(
+          pedidoData.condiciones_aceptadas_at &&
+          pedidoData.condiciones_version === CONDICIONES_COMPRA_VERSION
+        )
+      );
       setCargando(false);
     }
 
@@ -86,6 +91,11 @@ export default function PagoPage() {
 
   async function iniciarPago() {
     if (pagando) return;
+
+    if (!condicionesAceptadas) {
+      setError('Debes aceptar las condiciones de compra antes de pagar.');
+      return;
+    }
 
     setError('');
     setPagando(true);
@@ -98,6 +108,18 @@ export default function PagoPage() {
       if (!session?.access_token) {
         router.push('/login');
         return;
+      }
+
+      const { error: condicionesError } = await supabase.rpc(
+        'aceptar_condiciones_compra',
+        {
+          p_pedido_id: id,
+          p_version: CONDICIONES_COMPRA_VERSION
+        }
+      );
+
+      if (condicionesError) {
+        throw condicionesError;
       }
 
       const respuesta = await fetch('/api/stripe/checkout', {
@@ -140,7 +162,7 @@ export default function PagoPage() {
     );
   }
 
-  if (error || !pedido) {
+  if (error && !pedido) {
     return (
       <main className="checkout-page">
         <h1>No se pudo abrir el pago</h1>
@@ -148,6 +170,8 @@ export default function PagoPage() {
       </main>
     );
   }
+
+  if (!pedido) return null;
 
   return (
     <main className="checkout-page">
@@ -194,6 +218,27 @@ export default function PagoPage() {
             </Link>
           </div>
 
+          <div className="checkout-block">
+            <span className="page-eyebrow">
+              Condiciones de compra
+            </span>
+
+            <label className="checkout-acceptance">
+              <input
+                type="checkbox"
+                checked={condicionesAceptadas}
+                onChange={e => setCondicionesAceptadas(e.target.checked)}
+              />
+              <span>
+                He leído y acepto las{' '}
+                <Link href="/condiciones-compra" target="_blank">
+                  condiciones de compra
+                </Link>, incluida la información sobre entrega, devoluciones y
+                derecho de desistimiento.
+              </span>
+            </label>
+          </div>
+
           {error && (
             <p className="cart-order-error">
               {error}
@@ -204,7 +249,7 @@ export default function PagoPage() {
             type="button"
             className="button dark checkout-continue"
             onClick={iniciarPago}
-            disabled={pagando}
+            disabled={pagando || !condicionesAceptadas}
           >
             {pagando
               ? 'Abriendo pago seguro…'
