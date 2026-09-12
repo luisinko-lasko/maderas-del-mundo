@@ -13,6 +13,7 @@ export default function PagoPage() {
   const [pedido, setPedido] = useState(null);
   const [lineas, setLineas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [pagando, setPagando] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -40,13 +41,18 @@ export default function PagoPage() {
       }
 
       const reservaVencida =
-        pedidoData.reserva_hasta &&
+        !pedidoData.reserva_hasta ||
         new Date(pedidoData.reserva_hasta) <= new Date();
 
-      if (
-        !['reservado', 'pendiente_pago'].includes(pedidoData.estado) ||
-        reservaVencida
-      ) {
+      // Un pedido todavía "reservado" no ha pasado por el formulario de
+      // entrega/contacto. Lo devolvemos a ese paso en lugar de dejar que
+      // llegue directamente a Stripe.
+      if (pedidoData.estado === 'reservado' && !reservaVencida) {
+        router.replace(`/checkout/${id}`);
+        return;
+      }
+
+      if (pedidoData.estado !== 'pendiente_pago' || reservaVencida) {
         borrarPedidoActivo();
 
         setError(
@@ -79,7 +85,10 @@ export default function PagoPage() {
   }, [id, router]);
 
   async function iniciarPago() {
+    if (pagando) return;
+
     setError('');
+    setPagando(true);
 
     try {
       const {
@@ -119,6 +128,7 @@ export default function PagoPage() {
     } catch (err) {
       console.error(err);
       setError(err.message || 'No se pudo iniciar el pago');
+      setPagando(false);
     }
   }
 
@@ -184,12 +194,21 @@ export default function PagoPage() {
             </Link>
           </div>
 
+          {error && (
+            <p className="cart-order-error">
+              {error}
+            </p>
+          )}
+
           <button
             type="button"
             className="button dark checkout-continue"
             onClick={iniciarPago}
+            disabled={pagando}
           >
-            Pagar {Number(pedido.total).toFixed(2)} €
+            {pagando
+              ? 'Abriendo pago seguro…'
+              : `Pagar ${Number(pedido.total).toFixed(2)} €`}
           </button>
 
         </section>
