@@ -44,13 +44,15 @@ export default function RootLayout({ children }) {
         <footer className="footer">
           <div>
             <strong>Maderas del mundo</strong><br/>
-            Una colección material del mundo.
+            Una colección material del mundo.<br/>
+            <a href="mailto:contacto@maderasdelmundo.es">contacto@maderasdelmundo.es</a>
           </div>
 
           {newsletterEnabled && <NewsletterForm />}
 
           <div className="footer-meta">
             Madrid · Proyecto 2026<br/>
+            <Link href="/aviso-legal">Aviso legal</Link><br/>
             <Link href="/privacidad">Política de privacidad</Link><br/>
             Primera versión de trabajo
           </div>
