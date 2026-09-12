@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../../../../lib/supabase';
 import { borrarPedidoActivo } from '../../../../lib/carrito';
 import { CONDICIONES_COMPRA_VERSION } from '../../../../lib/legal';
+import styles from './pago.module.css';
 
 export default function PagoPage() {
   const { id } = useParams();
@@ -223,7 +224,7 @@ export default function PagoPage() {
               Condiciones de compra
             </span>
 
-            <label className="checkout-acceptance">
+            <label className={styles.acceptance}>
               <input
                 type="checkbox"
                 checked={condicionesAceptadas}
