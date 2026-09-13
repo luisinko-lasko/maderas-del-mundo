@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import WoodTile from '../components/WoodTile';
+import HomeWoodRotator from '../components/HomeWoodRotator';
 import { maderas } from '../lib/maderas';
 
 export default function Home() {
@@ -13,9 +14,7 @@ export default function Home() {
           <Link href="/catalogo" className="button dark">Explorar la colección</Link>
           <Link href="/about" className="text-link">Conocer el proyecto →</Link>
         </div>
-        <div className="hero-object" aria-hidden="true">
-          <div className="sample-stack s1"></div><div className="sample-stack s2"></div><div className="sample-stack s3"></div><div className="sample-stack s4"></div>
-        </div>
+        <HomeWoodRotator />
       </section>
 
       <section className="manifesto">
