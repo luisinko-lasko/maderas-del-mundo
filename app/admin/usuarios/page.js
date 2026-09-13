@@ -136,8 +136,13 @@ export default function AdminUsuarios() {
   }
 
   async function borrarUsuario(usuario) {
+    const pedidos = Number(usuario.pedidos || 0);
+    const avisoPedidos = pedidos > 0
+      ? `\n\nSus ${pedidos} ${pedidos === 1 ? 'pedido se conservará' : 'pedidos se conservarán'} como histórico, pero quedarán desvinculados de la cuenta.`
+      : '';
+
     if (!window.confirm(
-      `¿Borrar definitivamente a ${usuario.email}? Esta acción no se puede deshacer.`
+      `¿Borrar definitivamente a ${usuario.email}?${avisoPedidos}\n\nLa cuenta, el perfil y su colección se eliminarán. Esta acción no se puede deshacer.`
     )) return;
 
     setProcesando(usuario.user_id);
@@ -145,8 +150,17 @@ export default function AdminUsuarios() {
     setMensaje('');
 
     try {
-      await llamarAdmin({ accion: 'borrar', user_id: usuario.user_id });
-      setMensaje('Usuario borrado.');
+      const resultado = await llamarAdmin({
+        accion: 'borrar',
+        user_id: usuario.user_id
+      });
+
+      const conservados = Number(resultado.pedidos_preservados || 0);
+      setMensaje(
+        conservados > 0
+          ? `Usuario borrado. ${conservados} ${conservados === 1 ? 'pedido conservado' : 'pedidos conservados'} como histórico.`
+          : 'Usuario borrado.'
+      );
       await cargarUsuarios();
     } catch (e) {
       setError(e.message);
