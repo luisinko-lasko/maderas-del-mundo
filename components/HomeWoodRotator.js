@@ -1,17 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import styles from './HomeWoodRotator.module.css';
-
-function barajar(lista) {
-  const copia = [...lista];
-  for (let i = copia.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copia[i], copia[j]] = [copia[j], copia[i]];
-  }
-  return copia;
-}
 
 export default function HomeWoodRotator() {
   const [maderas, setMaderas] = useState([]);
@@ -31,28 +22,31 @@ export default function HomeWoodRotator() {
 
       if (!activo || error) return;
 
-      const conImagen = (data || []).filter((m) => m.imagen_url?.trim());
-      setMaderas(barajar(conImagen));
+      const conImagen = (data || []).filter((m) => Boolean(m.imagen_url && m.imagen_url.trim()));
+      if (!conImagen.length) return;
+
+      setMaderas(conImagen);
+      setIndice(Math.floor(Math.random() * conImagen.length));
     }
 
     cargar();
-    return () => { activo = false; };
+
+    return () => {
+      activo = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (maderas.length < 2) return undefined;
+    if (maderas.length < 2) return;
 
-    const timer = window.setInterval(() => {
+    const timer = setInterval(() => {
       setIndice((actual) => (actual + 1) % maderas.length);
     }, 7000);
 
-    return () => window.clearInterval(timer);
+    return () => clearInterval(timer);
   }, [maderas.length]);
 
-  const madera = useMemo(
-    () => (maderas.length ? maderas[indice % maderas.length] : null),
-    [maderas, indice]
-  );
+  const madera = maderas.length ? maderas[indice % maderas.length] : null;
 
   if (!madera) {
     return <div className={`${styles.frame} ${styles.fallback}`} aria-hidden="true" />;
@@ -69,7 +63,7 @@ export default function HomeWoodRotator() {
       <figcaption className={styles.caption}>
         <span>#{String(madera.xilo_id).padStart(3, '0')}</span>
         <strong>{madera.nombre}</strong>
-        {madera.nombre_cientifico && <em>{madera.nombre_cientifico}</em>}
+        {madera.nombre_cientifico ? <em>{madera.nombre_cientifico}</em> : null}
       </figcaption>
     </figure>
   );
