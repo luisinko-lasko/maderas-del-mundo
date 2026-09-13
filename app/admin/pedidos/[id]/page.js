@@ -27,6 +27,8 @@ export default function AdminPedidoDetalle() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [cambiando, setCambiando] = useState(false);
+  const [enviandoEmail, setEnviandoEmail] = useState(false);
+  const [mensajeEmail, setMensajeEmail] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -129,6 +131,47 @@ export default function AdminPedidoDetalle() {
     setCambiando(false);
   }
 
+  async function enviarConfirmacion() {
+    if (enviandoEmail) return;
+
+    setEnviandoEmail(true);
+    setMensajeEmail('');
+    setError(null);
+
+    try {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        router.replace('/login');
+        return;
+      }
+
+      const respuesta = await fetch(
+        `/api/admin/pedidos/${id}/email-confirmacion`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        }
+      );
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(resultado.error || 'No se pudo enviar el correo.');
+      }
+
+      setMensajeEmail('Confirmación enviada por correo.');
+    } catch (err) {
+      setMensajeEmail(err.message || 'No se pudo enviar el correo.');
+    } finally {
+      setEnviandoEmail(false);
+    }
+  }
+
   if (cargando) {
     return (
       <main className="page-shell">
@@ -161,6 +204,7 @@ export default function AdminPedidoDetalle() {
   const perfil = datos.perfil || {};
   const lineas = datos.lineas || [];
   const siguiente = siguienteEstado[pedido.estado];
+  const puedeEnviarConfirmacion = ['pagado', 'preparando', 'enviado', 'entregado'].includes(pedido.estado);
 
   return (
     <main className="admin-page">
@@ -248,6 +292,25 @@ export default function AdminPedidoDetalle() {
 
             {(pedido.telefono_entrega || perfil.telefono) && (
               <span>{pedido.telefono_entrega || perfil.telefono}</span>
+            )}
+
+            {puedeEnviarConfirmacion && (
+              <div style={{ marginTop: '18px' }}>
+                <button
+                  type="button"
+                  className="button"
+                  onClick={enviarConfirmacion}
+                  disabled={enviandoEmail}
+                >
+                  {enviandoEmail
+                    ? 'Enviando confirmación…'
+                    : 'Enviar confirmación por email'}
+                </button>
+
+                {mensajeEmail && (
+                  <p style={{ marginTop: '10px' }}>{mensajeEmail}</p>
+                )}
+              </div>
             )}
           </section>
 
