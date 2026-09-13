@@ -1,0 +1,156 @@
+.shell {
+  max-width: 920px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.header p {
+  max-width: 680px;
+  margin: 8px 0 0;
+  color: #66635b;
+  line-height: 1.55;
+}
+
+.panel {
+  border: 1px solid #d8d4c9;
+  background: #fff;
+  padding: 24px;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #ece8de;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid #c8c3b7;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.form {
+  display: grid;
+  gap: 20px;
+}
+
+.form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.form textarea,
+.form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cfc9bd;
+  background: #fff;
+  padding: 11px 12px;
+  font: inherit;
+}
+
+.form textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: -10px;
+  color: #77736b;
+  font-size: 0.82rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.secondary {
+  border: 1px solid #bdb7aa;
+  background: transparent;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.secondary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notice {
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  background: #f2f0e8;
+  border: 1px solid #d8d4c9;
+}
+
+.error {
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  border: 1px solid #b66;
+  color: #7f2e2e;
+  background: #fff7f7;
+}
+
+.preview {
+  margin-top: 26px;
+}
+
+.previewBox {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #1f1f1c;
+  color: #f7f4eb;
+  text-align: center;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 720px) {
+  .header,
+  .statusRow,
+  .meta {
+    display: block;
+  }
+
+  .dates {
+    grid-template-columns: 1fr;
+  }
+
+  .status {
+    margin-top: 10px;
+  }
+
+  .meta span {
+    display: block;
+    margin-top: 4px;
+  }
+}
