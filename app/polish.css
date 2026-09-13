@@ -295,6 +295,10 @@ button,
   background: #ddd8ca;
 }
 
+.dashboard .add-code {
+  display: none;
+}
+
 /* Administración: pequeños ajustes comunes sin rediseñarla */
 .admin-main input,
 .admin-main select,
