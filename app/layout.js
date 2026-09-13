@@ -1,10 +1,12 @@
 import './globals.css';
 import './mobile-menu.css';
 import './admin-mobile.css';
+import './banner.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import AuthRecoveryRedirect from '../components/AuthRecoveryRedirect';
 import MobileMenu from '../components/MobileMenu';
+import PublicBanner from '../components/PublicBanner';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -35,7 +37,10 @@ export default function RootLayout({ children }) {
 
           <MobileMenu />
         </header>
+
+        <PublicBanner />
         {children}
+
         <footer className="footer">
           <div>
             <strong>Maderas del mundo</strong><br/>
