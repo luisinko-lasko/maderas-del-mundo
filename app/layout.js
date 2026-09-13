@@ -42,11 +42,10 @@ export default function RootLayout({ children }) {
           </div>
 
           <div className="footer-meta">
-            Madrid · Proyecto 2026<br/>
+            Madrid · 2026<br/>
             <Link href="/condiciones-compra">Condiciones de compra</Link><br/>
             <Link href="/aviso-legal">Aviso legal</Link><br/>
-            <Link href="/privacidad">Política de privacidad</Link><br/>
-            Primera versión de trabajo
+            <Link href="/privacidad">Política de privacidad</Link>
           </div>
         </footer>
       </body>
