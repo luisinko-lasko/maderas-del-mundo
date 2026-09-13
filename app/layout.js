@@ -3,6 +3,7 @@ import './mobile-menu.css';
 import './admin-mobile.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
+import AuthRecoveryRedirect from '../components/AuthRecoveryRedirect';
 import MobileMenu from '../components/MobileMenu';
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body>
         <AdminMenuEnhancer />
+        <AuthRecoveryRedirect />
 
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Maderas del mundo, inicio">
