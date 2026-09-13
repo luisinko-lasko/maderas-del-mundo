@@ -191,7 +191,7 @@ export default function TiendaPage() {
             <div className="shop-section-heading">
               <div>
                 <div className="page-eyebrow">
-                  Muestras individuales
+                  Piezas individuales
                 </div>
                 <h2>Piezas</h2>
               </div>
