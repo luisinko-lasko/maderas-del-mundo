@@ -6,6 +6,7 @@ import './polish.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import AuthRecoveryRedirect from '../components/AuthRecoveryRedirect';
+import GuestOrderLinker from '../components/GuestOrderLinker';
 import MobileMenu from '../components/MobileMenu';
 import PublicBanner from '../components/PublicBanner';
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
       <body>
         <AdminMenuEnhancer />
         <AuthRecoveryRedirect />
+        <GuestOrderLinker />
 
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Maderas del mundo, inicio">
