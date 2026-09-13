@@ -62,6 +62,28 @@ export default function AdminMenuEnhancer() {
         } else {
           produccion.classList.remove('active');
         }
+
+        let banner = nav.querySelector('a[href="/admin/banner"]');
+
+        if (!banner) {
+          banner = document.createElement('a');
+          banner.href = '/admin/banner';
+          banner.textContent = 'Banner';
+          banner.dataset.adminBanner = 'true';
+
+          const usuarios = nav.querySelector('a[href="/admin/usuarios"]');
+          if (usuarios?.nextSibling) {
+            nav.insertBefore(banner, usuarios.nextSibling);
+          } else {
+            nav.appendChild(banner);
+          }
+        }
+
+        if (pathname.startsWith('/admin/banner')) {
+          banner.classList.add('active');
+        } else {
+          banner.classList.remove('active');
+        }
       });
     }
 
@@ -104,6 +126,10 @@ export default function AdminMenuEnhancer() {
 
       document
         .querySelectorAll('a[data-admin-catalog="true"]')
+        .forEach((link) => link.remove());
+
+      document
+        .querySelectorAll('a[data-admin-banner="true"]')
         .forEach((link) => link.remove());
     };
   }, [pathname, router]);
