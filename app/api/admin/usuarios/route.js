@@ -176,16 +176,13 @@ export async function POST(request) {
 
       if (pedidosError) return respuestaError(pedidosError.message);
 
-      if ((count || 0) > 0) {
-        return respuestaError(
-          'Este usuario tiene pedidos y no se puede borrar sin perder la trazabilidad de las ventas.'
-        );
-      }
-
       const { error } = await supabase.auth.admin.deleteUser(userId);
       if (error) return respuestaError(error.message);
 
-      return Response.json({ ok: true });
+      return Response.json({
+        ok: true,
+        pedidos_preservados: count || 0
+      });
     }
 
     return respuestaError('Acción no reconocida.');
