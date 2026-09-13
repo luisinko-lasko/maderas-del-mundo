@@ -34,11 +34,11 @@ export default function Home() {
       <section className="digital-section">
         <div className="digital-title">Tu colección también vive online.</div>
         <div className="digital-grid">
-          <div><span className="big-stat">24</span><span className="small-label">especies reunidas</span></div>
-          <div><span className="big-stat">38%</span><span className="small-label">de una serie de ejemplo</span></div>
-          <div className="digital-copy">Cada usuario podrá consultar sus piezas, descubrir las que le faltan y acceder directamente a la ficha de cada madera.</div>
+          <div><span className="big-stat">Materia</span><span className="small-label">piezas físicas para mirar, tocar y comparar</span></div>
+          <div><span className="big-stat">Ficha</span><span className="small-label">información de cada madera siempre disponible</span></div>
+          <div className="digital-copy">En Mi colección puedes consultar las piezas que ya tienes, descubrir las que te faltan y acceder directamente a la ficha de cada madera.</div>
         </div>
-        <Link href="/coleccion" className="button light">Ver ejemplo de Mi colección</Link>
+        <Link href="/coleccion" className="button light">Abrir Mi colección</Link>
       </section>
     </main>
   );
