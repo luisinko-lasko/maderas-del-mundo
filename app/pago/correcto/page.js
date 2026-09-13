@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
 import {
   vaciarCarrito,
-  borrarPedidoActivo
+  borrarPedidoActivo,
+  leerPedidoActivo
 } from '../../../lib/carrito';
 
 export default function PagoCorrectoPage() {
   const [pedido, setPedido] = useState(null);
+  const [esInvitado, setEsInvitado] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
 
@@ -18,47 +20,43 @@ export default function PagoCorrectoPage() {
       try {
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get('session_id');
+        const guest = params.get('guest') === '1';
 
-        if (!sessionId) {
-          throw new Error(
-            'No se ha recibido la referencia del pago.'
-          );
+        if (!sessionId) throw new Error('No se ha recibido la referencia del pago.');
+
+        let respuesta;
+
+        if (guest) {
+          const activo = leerPedidoActivo();
+          if (!activo?.guestToken || activo?.modo !== 'invitado') {
+            throw new Error('No se ha podido recuperar la referencia segura del pedido de invitado.');
+          }
+
+          setEsInvitado(true);
+          respuesta = await fetch('/api/stripe/resultado-invitado', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, guestToken: activo.guestToken })
+          });
+        } else {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) {
+            throw new Error('Debes iniciar sesión para consultar el pedido.');
+          }
+
+          respuesta = await fetch('/api/stripe/resultado', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, accessToken: session.access_token })
+          });
         }
-
-        const {
-          data: { session }
-        } = await supabase.auth.getSession();
-
-        if (!session?.access_token) {
-          throw new Error(
-            'Debes iniciar sesión para consultar el pedido.'
-          );
-        }
-
-        const respuesta = await fetch('/api/stripe/resultado', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            sessionId,
-            accessToken: session.access_token
-          })
-        });
 
         const resultado = await respuesta.json();
-
-        if (!respuesta.ok) {
-          throw new Error(
-            resultado.error || 'No se pudo comprobar el pago.'
-          );
-        }
+        if (!respuesta.ok) throw new Error(resultado.error || 'No se pudo comprobar el pago.');
 
         setPedido(resultado.pedido);
-
         vaciarCarrito();
         borrarPedidoActivo();
-
       } catch (err) {
         setError(err.message);
       } finally {
@@ -69,31 +67,19 @@ export default function PagoCorrectoPage() {
     comprobarPago();
   }, []);
 
-  if (cargando) {
-    return (
-      <main className="checkout-page">
-        <p>Comprobando el pago…</p>
-      </main>
-    );
-  }
+  if (cargando) return <main className="checkout-page"><p>Comprobando el pago…</p></main>;
 
   if (error) {
     return (
       <main className="checkout-page">
         <div className="checkout-heading">
-          <div className="page-eyebrow">
-            Maderas del mundo / Pedido
-          </div>
+          <div className="page-eyebrow">Maderas del mundo / Pedido</div>
           <h1>No se pudo confirmar el pago</h1>
         </div>
-
         <section className="checkout-form">
           <div className="checkout-block">
             <p>{error}</p>
-
-            <Link href="/tienda" className="button">
-              Volver a la tienda
-            </Link>
+            <Link href="/tienda" className="button">Volver a la tienda</Link>
           </div>
         </section>
       </main>
@@ -102,88 +88,47 @@ export default function PagoCorrectoPage() {
 
   return (
     <main className="checkout-page">
-
       <div className="checkout-heading">
-        <div className="page-eyebrow">
-          Maderas del mundo / Pedido
-        </div>
-
+        <div className="page-eyebrow">Maderas del mundo / Pedido</div>
         <h1>Pago realizado</h1>
       </div>
 
       <section className="checkout-form">
         <div className="checkout-block">
-
-          <span className="page-eyebrow">
-            Pedido confirmado
-          </span>
-
-          <h2 className="payment-title">
-            Gracias por tu compra
-          </h2>
-
-          <p>
-            Pedido {pedido.id.slice(0, 8).toUpperCase()}
-          </p>
+          <span className="page-eyebrow">Pedido confirmado</span>
+          <h2 className="payment-title">Gracias por tu compra</h2>
+          <p>Pedido {pedido.id.slice(0, 8).toUpperCase()}</p>
 
           <div style={{ marginTop: '2rem' }}>
             {pedido.pedido_lineas?.map(linea => (
-              <div
-                key={linea.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: '2rem',
-                  marginBottom: '.75rem'
-                }}
-              >
-                <span>
-                  {linea.nombre} × {linea.cantidad}
-                </span>
-
-                <strong>
-                  {(
-                    Number(linea.precio_unitario) *
-                    linea.cantidad
-                  ).toFixed(2)} €
-                </strong>
+              <div key={linea.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '2rem', marginBottom: '.75rem' }}>
+                <span>{linea.nombre} × {linea.cantidad}</span>
+                <strong>{(Number(linea.precio_unitario) * linea.cantidad).toFixed(2)} €</strong>
               </div>
             ))}
           </div>
 
-          <div
-            style={{
-              marginTop: '1.5rem',
-              paddingTop: '1rem',
-              borderTop: '1px solid currentColor',
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}
-          >
+          <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid currentColor', display: 'flex', justifyContent: 'space-between' }}>
             <strong>Total</strong>
-            <strong>
-              {Number(pedido.total).toFixed(2)} €
-            </strong>
+            <strong>{Number(pedido.total).toFixed(2)} €</strong>
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            marginTop: '2rem',
-            flexWrap: 'wrap'
-          }}>
-            <Link href="/coleccion" className="button dark">
-              Ver mi colección
-            </Link>
+          {esInvitado && (
+            <p style={{ marginTop: '2rem', maxWidth: '580px' }}>
+              Has comprado como invitado. Si creas una cuenta con el mismo correo de la compra, este pedido y sus maderas se incorporarán automáticamente a Mi colección.
+            </p>
+          )}
 
-            <Link href="/tienda" className="button">
-              Volver a la tienda
-            </Link>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+            {esInvitado ? (
+              <Link href="/login" className="button dark">Crear cuenta / entrar</Link>
+            ) : (
+              <Link href="/coleccion" className="button dark">Ver mi colección</Link>
+            )}
+            <Link href="/tienda" className="button">Volver a la tienda</Link>
           </div>
-
         </div>
       </section>
-
     </main>
   );
 }
