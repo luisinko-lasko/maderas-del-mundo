@@ -4,7 +4,6 @@ import './admin-mobile.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import MobileMenu from '../components/MobileMenu';
-import NewsletterForm from '../components/NewsletterForm';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -12,12 +11,6 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const newsletterEnabled = Boolean(
-    process.env.BREVO_API_KEY &&
-    process.env.BREVO_LIST_ID &&
-    process.env.BREVO_DOI_TEMPLATE_ID
-  );
-
   return (
     <html lang="es">
       <body>
@@ -47,8 +40,6 @@ export default function RootLayout({ children }) {
             Una colección material del mundo.<br/>
             <a href="mailto:contacto@maderasdelmundo.es">contacto@maderasdelmundo.es</a>
           </div>
-
-          {newsletterEnabled && <NewsletterForm />}
 
           <div className="footer-meta">
             Madrid · Proyecto 2026<br/>
