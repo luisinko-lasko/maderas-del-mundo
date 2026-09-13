@@ -149,7 +149,10 @@ export async function POST(request) {
 
       if (cambioError) return respuestaError(cambioError.message);
 
-      const origen = new URL(request.url).origin;
+      const origen = String(
+        process.env.NEXT_PUBLIC_SITE_URL || 'https://maderasdelmundo.es'
+      ).replace(/\/+$/, '');
+
       const { error: correoError } = await supabase.auth.resetPasswordForEmail(
         usuarioData.user.email,
         { redirectTo: `${origen}/cambiar-password` }
