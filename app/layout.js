@@ -2,6 +2,7 @@ import './globals.css';
 import './mobile-menu.css';
 import './admin-mobile.css';
 import './banner.css';
+import './polish.css';
 import Link from 'next/link';
 import AdminMenuEnhancer from '../components/AdminMenuEnhancer';
 import AuthRecoveryRedirect from '../components/AuthRecoveryRedirect';
