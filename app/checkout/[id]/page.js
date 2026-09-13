@@ -4,60 +4,100 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
+import { leerPedidoActivo } from '../../../lib/carrito';
+
+const formVacio = {
+  entrega: 'envio',
+  nombre: '',
+  apellidos: '',
+  email: '',
+  telefono: '',
+  direccion: '',
+  codigo_postal: '',
+  poblacion: '',
+  provincia: '',
+  pais: 'España'
+};
 
 export default function CheckoutPage() {
   const { id } = useParams();
   const router = useRouter();
-
   const [pedido, setPedido] = useState(null);
   const [lineas, setLineas] = useState([]);
+  const [esInvitado, setEsInvitado] = useState(false);
+  const [guestToken, setGuestToken] = useState('');
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
-
-  const [form, setForm] = useState({
-    entrega: 'envio',
-    nombre: '',
-    apellidos: '',
-    email: '',
-    telefono: '',
-    direccion: '',
-    codigo_postal: '',
-    poblacion: '',
-    provincia: '',
-    pais: 'España'
-  });
+  const [form, setForm] = useState(formVacio);
 
   useEffect(() => {
     async function cargar() {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
+      const activo = leerPedidoActivo();
+      const invitado = activo?.id === id && activo?.modo === 'invitado' && activo?.guestToken;
 
-      if (!user) {
-        router.push('/login');
+      if (invitado) {
+        setEsInvitado(true);
+        setGuestToken(activo.guestToken);
+
+        const respuesta = await fetch('/api/guest/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'read',
+            pedidoId: id,
+            guestToken: activo.guestToken
+          })
+        });
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.pedido) {
+          setError(resultado.error || 'No se pudo cargar el pedido.');
+          setCargando(false);
+          return;
+        }
+
+        const p = resultado.pedido;
+        setPedido(p);
+        setLineas(p.pedido_lineas || []);
+        setForm({
+          entrega: p.entrega || 'envio',
+          nombre: p.nombre_entrega || '',
+          apellidos: p.apellidos_entrega || '',
+          email: p.email_entrega || '',
+          telefono: p.telefono_entrega || '',
+          direccion: p.direccion_entrega || '',
+          codigo_postal: p.codigo_postal_entrega || '',
+          poblacion: p.poblacion_entrega || '',
+          provincia: p.provincia_entrega || '',
+          pais: p.pais_entrega || 'España'
+        });
+        setCargando(false);
         return;
       }
 
-      const { data: pedidoData, error: pedidoError } =
-        await supabase
-          .from('pedidos')
-          .select('*')
-          .eq('id', id)
-          .single();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.replace('/continuar-compra');
+        return;
+      }
 
-      if (pedidoError) {
+      const { data: pedidoData, error: pedidoError } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (pedidoError || !pedidoData) {
         setError('No se pudo cargar el pedido.');
         setCargando(false);
         return;
       }
 
-      const { data: lineasData, error: lineasError } =
-        await supabase
-          .from('pedido_lineas')
-          .select('*')
-          .eq('pedido_id', id)
-          .order('created_at');
+      const [{ data: lineasData, error: lineasError }, { data: perfilData }] = await Promise.all([
+        supabase.from('pedido_lineas').select('*').eq('pedido_id', id).order('created_at'),
+        supabase.from('perfiles').select('*').eq('user_id', user.id).maybeSingle()
+      ]);
 
       if (lineasError) {
         setError('No se pudo cargar el contenido del pedido.');
@@ -65,19 +105,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      const { data: perfilData, error: perfilError } = await supabase
-        .from('perfiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (perfilError) {
-        console.error('Error cargando perfil:', perfilError);
-      }
-
       setPedido(pedidoData);
       setLineas(lineasData || []);
-
       setForm({
         entrega: pedidoData.entrega || 'envio',
         nombre: pedidoData.nombre_entrega || perfilData?.nombre || '',
@@ -90,7 +119,6 @@ export default function CheckoutPage() {
         provincia: pedidoData.provincia_entrega || perfilData?.provincia || '',
         pais: pedidoData.pais_entrega || perfilData?.pais || 'España'
       });
-
       setCargando(false);
     }
 
@@ -98,10 +126,7 @@ export default function CheckoutPage() {
   }, [id, router]);
 
   function cambiar(e) {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm(actual => ({ ...actual, [e.target.name]: e.target.value }));
   }
 
   async function continuar(e) {
@@ -112,332 +137,137 @@ export default function CheckoutPage() {
       setError('Completa los datos de contacto.');
       return;
     }
-
-    if (
-      form.entrega === 'envio' &&
-      (
-        !form.direccion ||
-        !form.codigo_postal ||
-        !form.poblacion ||
-        !form.provincia ||
-        !form.pais
-      )
-    ) {
+    if (form.entrega === 'envio' && (!form.direccion || !form.codigo_postal || !form.poblacion || !form.provincia || !form.pais)) {
       setError('Completa la dirección de envío.');
       return;
     }
 
     setGuardando(true);
 
-    const { error: guardarError } = await supabase.rpc(
-      'guardar_checkout',
-      {
+    if (esInvitado) {
+      const respuesta = await fetch('/api/guest/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save',
+          pedidoId: id,
+          guestToken,
+          form
+        })
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok) {
+        setError(resultado.error || 'No se pudieron guardar los datos.');
+        setGuardando(false);
+        return;
+      }
+    } else {
+      const { error: guardarError } = await supabase.rpc('guardar_checkout', {
         p_pedido_id: id,
         p_entrega: form.entrega,
         p_nombre: form.nombre,
         p_apellidos: form.apellidos,
         p_email: form.email,
         p_telefono: form.telefono,
-        p_direccion:
-          form.entrega === 'envio'
-            ? form.direccion
-            : null,
-        p_codigo_postal:
-          form.entrega === 'envio'
-            ? form.codigo_postal
-            : null,
-        p_poblacion:
-          form.entrega === 'envio'
-            ? form.poblacion
-            : null,
-        p_provincia:
-          form.entrega === 'envio'
-            ? form.provincia
-            : null,
-        p_pais:
-          form.entrega === 'envio'
-            ? form.pais
-            : 'España'
-      }
-    );
+        p_direccion: form.entrega === 'envio' ? form.direccion : null,
+        p_codigo_postal: form.entrega === 'envio' ? form.codigo_postal : null,
+        p_poblacion: form.entrega === 'envio' ? form.poblacion : null,
+        p_provincia: form.entrega === 'envio' ? form.provincia : null,
+        p_pais: form.entrega === 'envio' ? form.pais : 'España'
+      });
 
-    if (guardarError) {
-      setError(guardarError.message);
-      setGuardando(false);
-      return;
+      if (guardarError) {
+        setError(guardarError.message);
+        setGuardando(false);
+        return;
+      }
     }
 
     router.push(`/checkout/${id}/pago`);
   }
 
-  if (cargando) {
-    return (
-      <main className="checkout-page">
-        <p>Cargando pedido…</p>
-      </main>
-    );
-  }
+  if (cargando) return <main className="checkout-page"><p>Cargando pedido…</p></main>;
 
   if (error && !pedido) {
-    return (
-      <main className="checkout-page">
-        <h1>No se pudo abrir el pedido</h1>
-        <p>{error}</p>
-      </main>
-    );
+    return <main className="checkout-page"><h1>No se pudo abrir el pedido</h1><p>{error}</p></main>;
   }
 
   return (
     <main className="checkout-page">
-
       <div className="checkout-heading">
-        <div className="page-eyebrow">
-          Maderas del mundo / Pedido
-        </div>
+        <div className="page-eyebrow">Maderas del mundo / Pedido</div>
         <h1>Finalizar compra</h1>
+        {esInvitado && <p>Compra como invitado · no necesitas crear una cuenta.</p>}
       </div>
 
       <div className="checkout-layout">
-
-        <form
-          className="checkout-form"
-          onSubmit={continuar}
-        >
-
+        <form className="checkout-form" onSubmit={continuar}>
           <section className="checkout-block">
-            <span className="page-eyebrow">
-              01 · Entrega
-            </span>
-
+            <span className="page-eyebrow">01 · Entrega</span>
             <div className="checkout-delivery-options">
-
               <label>
-                <input
-                  type="radio"
-                  name="entrega"
-                  value="envio"
-                  checked={form.entrega === 'envio'}
-                  onChange={cambiar}
-                />
-                <span>
-                  <strong>Envío a domicilio</strong>
-                  <small>
-                    Enviaremos el pedido a la dirección indicada.
-                  </small>
-                </span>
+                <input type="radio" name="entrega" value="envio" checked={form.entrega === 'envio'} onChange={cambiar} />
+                <span><strong>Envío a domicilio</strong><small>Enviaremos el pedido a la dirección indicada.</small></span>
               </label>
-
               <label>
-                <input
-                  type="radio"
-                  name="entrega"
-                  value="recogida"
-                  checked={form.entrega === 'recogida'}
-                  onChange={cambiar}
-                />
-                <span>
-                  <strong>Recogida en mano</strong>
-                  <small>
-                    Sin gastos de envío.
-                  </small>
-                </span>
+                <input type="radio" name="entrega" value="recogida" checked={form.entrega === 'recogida'} onChange={cambiar} />
+                <span><strong>Recogida en mano</strong><small>Sin gastos de envío.</small></span>
               </label>
-
             </div>
           </section>
-
 
           <section className="checkout-block">
-            <span className="page-eyebrow">
-              02 · Datos de contacto
-            </span>
-
+            <span className="page-eyebrow">02 · Datos de contacto</span>
             <div className="checkout-fields two">
-              <label>
-                Nombre
-                <input
-                  name="nombre"
-                  value={form.nombre}
-                  onChange={cambiar}
-                  required
-                />
-              </label>
-
-              <label>
-                Apellidos
-                <input
-                  name="apellidos"
-                  value={form.apellidos}
-                  onChange={cambiar}
-                  required
-                />
-              </label>
-
-              <label>
-                Email
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={cambiar}
-                  required
-                />
-              </label>
-
-              <label>
-                Teléfono
-                <input
-                  name="telefono"
-                  value={form.telefono}
-                  onChange={cambiar}
-                  required
-                />
-              </label>
+              <label>Nombre<input name="nombre" value={form.nombre} onChange={cambiar} required /></label>
+              <label>Apellidos<input name="apellidos" value={form.apellidos} onChange={cambiar} required /></label>
+              <label>Email<input type="email" name="email" value={form.email} onChange={cambiar} required /></label>
+              <label>Teléfono<input name="telefono" value={form.telefono} onChange={cambiar} required /></label>
             </div>
           </section>
-
 
           {form.entrega === 'envio' && (
             <section className="checkout-block">
-
-              <span className="page-eyebrow">
-                03 · Dirección
-              </span>
-
+              <span className="page-eyebrow">03 · Dirección de envío</span>
               <div className="checkout-fields">
-
-                <label>
-                  Dirección
-                  <input
-                    name="direccion"
-                    value={form.direccion}
-                    onChange={cambiar}
-                    required
-                  />
-                </label>
-
+                <label>Dirección<input name="direccion" value={form.direccion} onChange={cambiar} required /></label>
                 <div className="checkout-fields two">
-                  <label>
-                    Código postal
-                    <input
-                      name="codigo_postal"
-                      value={form.codigo_postal}
-                      onChange={cambiar}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    Población
-                    <input
-                      name="poblacion"
-                      value={form.poblacion}
-                      onChange={cambiar}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    Provincia
-                    <input
-                      name="provincia"
-                      value={form.provincia}
-                      onChange={cambiar}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    País
-                    <input
-                      name="pais"
-                      value={form.pais}
-                      onChange={cambiar}
-                      required
-                    />
-                  </label>
+                  <label>Código postal<input name="codigo_postal" value={form.codigo_postal} onChange={cambiar} required /></label>
+                  <label>Población<input name="poblacion" value={form.poblacion} onChange={cambiar} required /></label>
+                  <label>Provincia<input name="provincia" value={form.provincia} onChange={cambiar} required /></label>
+                  <label>País<input name="pais" value={form.pais} onChange={cambiar} required /></label>
                 </div>
-
               </div>
-
             </section>
           )}
 
-
-          {error && (
-            <p className="cart-order-error">
-              {error}
-            </p>
-          )}
-
-          <button
-            className="button dark checkout-continue"
-            disabled={guardando}
-          >
-            {guardando
-              ? 'Guardando…'
-              : 'Continuar al pago'}
+          {error && <p className="cart-order-error">{error}</p>}
+          <button className="button dark checkout-continue" disabled={guardando}>
+            {guardando ? 'Guardando…' : 'Continuar al pago'}
           </button>
-
         </form>
 
-
         <aside className="checkout-summary">
-
-          <span className="page-eyebrow">
-            Tu pedido
-          </span>
-
+          <span className="page-eyebrow">Tu pedido</span>
           <div className="checkout-lines">
-
             {lineas.map(linea => (
-              <div
-                className="checkout-line"
-                key={linea.id}
-              >
+              <div className="checkout-line" key={linea.id}>
                 <div>
                   <strong>{linea.nombre}</strong>
-
-                  <small>
-                    {linea.tipo === 'madera'
-                      ? 'Pieza individual'
-                      : 'Serie'}
-                  </small>
+                  <small>{linea.tipo === 'madera' ? 'Pieza individual' : 'Serie'}</small>
                 </div>
-
-                <div>
-                  {linea.cantidad > 1 &&
-                    `${linea.cantidad} × `}
-
-                  {Number(
-                    linea.precio_unitario
-                  ).toFixed(2)} €
-                </div>
+                <div>{linea.cantidad > 1 && `${linea.cantidad} × `}{Number(linea.precio_unitario).toFixed(2)} €</div>
               </div>
             ))}
-
           </div>
-
           <div className="checkout-total">
             <span>Total provisional</span>
-            <strong>
-              {Number(pedido.total).toFixed(2)} €
-            </strong>
+            <strong>{Number(pedido.total).toFixed(2)} €</strong>
           </div>
-
-          <p className="checkout-note">
-            Las piezas de este pedido están reservadas
-            temporalmente.
-          </p>
-
-          <Link href="/tienda">
-            ← Volver a la tienda
-          </Link>
-
+          <p className="checkout-note">Las piezas de este pedido están reservadas temporalmente.</p>
+          <Link href="/tienda">← Volver a la tienda</Link>
         </aside>
-
       </div>
-
     </main>
   );
 }
