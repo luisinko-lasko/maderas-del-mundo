@@ -1,0 +1,390 @@
+/* Acabado visual global · septiembre 2026 */
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+button,
+.button,
+.login-button,
+.nav a,
+.footer a,
+.text-link,
+.back,
+.wood-shop-catalog-link,
+.wood-card,
+.shop-individual-card,
+.shop-series-card,
+.catalog-list-row,
+.collection-row {
+  transition: opacity .18s ease, background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.button:not(:disabled):hover,
+.login-button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.nav a:hover,
+.footer a:hover,
+.text-link:hover,
+.back:hover,
+.wood-shop-catalog-link:hover {
+  opacity: .58;
+}
+
+/* Títulos secundarios y páginas funcionales */
+.login-page > h1,
+.account-page > h1,
+.page-shell > h1:not(.about-title),
+.cart-heading h1,
+.checkout-heading h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(52px, 7vw, 94px);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.045em;
+}
+
+.login-page > h1,
+.account-page > h1,
+.page-shell > h1:not(.about-title) {
+  margin: 12px 0 24px;
+}
+
+/* Catálogo: controles con una apariencia más editorial */
+.catalog-toolbar {
+  align-items: stretch;
+  margin-top: 22px;
+  margin-bottom: 38px;
+}
+
+.catalog-controls {
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.catalog-controls label {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.catalog-controls select {
+  border: 0;
+  border-bottom: 1px solid rgba(23, 37, 28, .3);
+  border-radius: 0;
+  padding: 7px 26px 7px 5px;
+  color: var(--ink);
+  background-color: transparent;
+  font-size: 12px;
+}
+
+.view-switch {
+  gap: 16px;
+}
+
+.view-switch button {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 7px 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.view-switch button.active {
+  border-bottom-color: var(--ink);
+  background: transparent;
+  color: var(--ink);
+}
+
+.filter-bar {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+}
+
+.filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-bar button {
+  flex: 0 0 auto;
+}
+
+.wood-card:hover {
+  opacity: .82;
+}
+
+.wood-card .arrow {
+  transition: transform .18s ease;
+}
+
+.wood-card:hover .arrow {
+  transform: translate(3px, -3px);
+}
+
+/* Ficha de madera */
+.detail-copy {
+  max-width: 760px;
+}
+
+.facts-title {
+  margin-top: 44px;
+}
+
+.data-note {
+  max-width: 620px;
+  line-height: 1.55;
+}
+
+/* Tienda */
+.shop-section-heading {
+  align-items: end;
+}
+
+.shop-individual-grid {
+  align-items: stretch;
+}
+
+.shop-individual-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-individual-card:hover {
+  opacity: .84;
+}
+
+.shop-individual-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-individual-bottom {
+  margin-top: auto;
+}
+
+.shop-series-card:hover {
+  background: rgba(255, 255, 255, .28);
+}
+
+.wood-shop-layout,
+.serie-detail-header {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wood-shop-info h1,
+.serie-detail-header h1 {
+  text-wrap: balance;
+}
+
+/* Carrito y checkout */
+.cart-item {
+  transition: background-color .18s ease;
+}
+
+.cart-item:hover {
+  background: rgba(255,255,255,.28);
+}
+
+.cart-remove {
+  text-underline-offset: 3px;
+}
+
+.cart-summary,
+.checkout-summary {
+  background: rgba(255,255,255,.26);
+}
+
+.checkout-heading {
+  max-width: 900px;
+}
+
+.checkout-form input,
+.checkout-form select,
+.login-form input,
+.login-form select,
+.login-form textarea {
+  border-radius: 0;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+
+.checkout-form input:focus,
+.checkout-form select:focus,
+.login-form input:focus,
+.login-form select:focus,
+.login-form textarea:focus {
+  border-color: var(--ink);
+  background: rgba(255,255,255,.42);
+}
+
+.checkout-delivery-options label:hover {
+  background: rgba(255,255,255,.35);
+}
+
+/* Área personal */
+.account-page {
+  max-width: 1180px;
+}
+
+.account-page > h1 {
+  margin-bottom: 34px;
+}
+
+.account-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 780px;
+  margin-top: 0;
+  margin-bottom: 54px;
+}
+
+.account-card {
+  min-height: 150px;
+}
+
+.account-link:hover {
+  background: rgba(255,255,255,.4);
+}
+
+.account-profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 18px 22px;
+  max-width: 900px;
+}
+
+.account-profile-form .login-button {
+  justify-self: start;
+  align-self: end;
+}
+
+.account-orders-head {
+  margin-top: 62px;
+}
+
+.account-order {
+  background: rgba(255,255,255,.22);
+}
+
+/* Mi colección */
+.dashboard .summary-cards {
+  grid-template-columns: minmax(180px, 260px);
+  width: fit-content;
+  min-width: 220px;
+  margin: 46px 0 42px;
+}
+
+.dashboard .summary-cards > div {
+  border-right: 0;
+}
+
+.collection-row:hover {
+  background: rgba(255,255,255,.34);
+}
+
+.collection-row .mini-sample {
+  background: #ddd8ca;
+}
+
+/* Administración: pequeños ajustes comunes sin rediseñarla */
+.admin-main input,
+.admin-main select,
+.admin-main textarea,
+.admin-main button {
+  border-radius: 0;
+}
+
+.admin-side nav a {
+  padding: 10px;
+  margin-top: 0;
+}
+
+.admin-side nav a:hover {
+  background: rgba(255,255,255,.08);
+}
+
+/* Pie */
+.footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .catalog-controls {
+    align-items: flex-start;
+  }
+
+  .account-profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .wood-shop-layout,
+  .serie-detail-header {
+    max-width: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .catalog-controls {
+    gap: 18px;
+  }
+
+  .catalog-controls label {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-switch {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .dashboard .summary-cards {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .footer {
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .footer-meta {
+    text-align: left;
+  }
+
+  .cart-heading,
+  .shop-section-heading,
+  .account-orders-head {
+    align-items: flex-start;
+  }
+
+  .cart-heading {
+    flex-direction: column;
+  }
+
+  .login-page > h1,
+  .account-page > h1,
+  .page-shell > h1:not(.about-title),
+  .cart-heading h1,
+  .checkout-heading h1 {
+    font-size: clamp(44px, 15vw, 64px);
+  }
+}
