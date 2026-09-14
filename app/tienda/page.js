@@ -94,6 +94,13 @@ export default function TiendaPage() {
     cargar();
   }, []);
 
+  const seriesPublicas = useMemo(() => {
+    return series.filter(serie => {
+      const composicion = serie.composicion || [];
+      return composicion.length > 0 && composicion.every(item => item.madera);
+    });
+  }, [series]);
+
   const stockMaderas = useMemo(() => {
     const mapa = {};
 
@@ -178,7 +185,7 @@ export default function TiendaPage() {
         </div>
       )}
 
-      {!error && series.length === 0 && (
+      {!error && seriesPublicas.length === 0 && (
         <div className="shop-empty">
           Todavía no hay Series disponibles.
         </div>
@@ -269,7 +276,7 @@ export default function TiendaPage() {
 
             <div className="shop-series-grid">
 
-          {series.map(serie => {
+          {seriesPublicas.map(serie => {
             const disponibles = disponibilidadSerie(serie);
             const cajasSerie = cajasDeSerie(serie.id);
             const agotada = disponibles === 0;
