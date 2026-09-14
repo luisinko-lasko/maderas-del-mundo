@@ -24,13 +24,7 @@ export default function SerieDetallePage() {
     if (!id) return;
 
     async function cargar() {
-      const [
-        serieRes,
-        piezasRes,
-        relacionesRes,
-        inventarioRes
-      ] = await Promise.all([
-
+      const [serieRes, piezasRes, relacionesRes, inventarioRes] = await Promise.all([
         supabase
           .from('productos')
           .select(`
@@ -91,7 +85,17 @@ export default function SerieDetallePage() {
         return;
       }
 
-      setSerie(serieRes.data);
+      const serieCargada = serieRes.data;
+      const composicion = serieCargada?.composicion || [];
+
+      if (!composicion.length || composicion.some(item => !item.madera)) {
+        setError('Esta serie no está disponible actualmente.');
+        setSerie(null);
+        setCargando(false);
+        return;
+      }
+
+      setSerie(serieCargada);
       setPiezas(piezasRes.data || []);
       setCajas(
         (relacionesRes.data || [])
@@ -99,7 +103,6 @@ export default function SerieDetallePage() {
           .filter(Boolean)
       );
       setInventario(inventarioRes.data || []);
-
       setCargando(false);
     }
 
@@ -110,8 +113,7 @@ export default function SerieDetallePage() {
     const mapa = {};
 
     piezas.forEach(p => {
-      mapa[p.madera_id] =
-        (mapa[p.madera_id] || 0) + 1;
+      mapa[p.madera_id] = (mapa[p.madera_id] || 0) + 1;
     });
 
     return mapa;
@@ -121,10 +123,7 @@ export default function SerieDetallePage() {
     return Object.fromEntries(
       inventario.map(i => [
         i.producto_id,
-        Math.max(
-          0,
-          Number(i.stock || 0) - Number(i.reservado || 0)
-        )
+        Math.max(0, Number(i.stock || 0) - Number(i.reservado || 0))
       ])
     );
   }, [inventario]);
@@ -134,31 +133,17 @@ export default function SerieDetallePage() {
 
     return Math.min(
       ...serie.composicion.map(item => {
-        const stock =
-          stockMaderas[item.madera_id] || 0;
-
-        return Math.floor(
-          stock / (item.cantidad || 1)
-        );
+        const stock = stockMaderas[item.madera_id] || 0;
+        return Math.floor(stock / (item.cantidad || 1));
       })
     );
   }
 
-  const cajaSeleccionada =
-    cajas.find(c => c.id === cajaElegida) || null;
+  const cajaSeleccionada = cajas.find(c => c.id === cajaElegida) || null;
 
-  const precioBase =
-    serie?.precio != null
-      ? Number(serie.precio)
-      : 0;
-
-  const precioCaja =
-    cajaSeleccionada?.precio != null
-      ? Number(cajaSeleccionada.precio)
-      : 0;
-
-  const precioTotal =
-    precioBase + precioCaja;
+  const precioBase = serie?.precio != null ? Number(serie.precio) : 0;
+  const precioCaja = cajaSeleccionada?.precio != null ? Number(cajaSeleccionada.precio) : 0;
+  const precioTotal = precioBase + precioCaja;
 
   if (cargando) {
     return (
@@ -172,7 +157,7 @@ export default function SerieDetallePage() {
     return (
       <main className="page-shell">
         <Link href="/tienda">← Tienda</Link>
-        <h1>No se pudo cargar la Serie</h1>
+        <h1>Serie no disponible</h1>
         {error && <p>{error}</p>}
       </main>
     );
@@ -182,95 +167,54 @@ export default function SerieDetallePage() {
 
   return (
     <main className="serie-detail-page">
-
       <div className="serie-detail-back">
-        <Link href="/tienda">
-          ← Tienda
-        </Link>
+        <Link href="/tienda">← Tienda</Link>
       </div>
 
       <header className="serie-detail-header">
-
         <div>
           <div className="page-eyebrow">
             Serie · {serie.composicion?.length || 0} maderas
           </div>
-
           <h1>{serie.nombre}</h1>
-
-          {serie.descripcion && (
-            <p>{serie.descripcion}</p>
-          )}
+          {serie.descripcion && <p>{serie.descripcion}</p>}
         </div>
 
         <div className="serie-detail-price">
           <span>Precio</span>
-
-          <strong>
-            {precioTotal.toFixed(2)} €
-          </strong>
-
-          <small>
-            {disponibles} disponibles
-          </small>
+          <strong>{precioTotal.toFixed(2)} €</strong>
+          <small>{disponibles} disponibles</small>
         </div>
-
       </header>
 
       <section className="serie-detail-section">
-
-        <div className="page-eyebrow">
-          Composición
-        </div>
+        <div className="page-eyebrow">Composición</div>
 
         <div className="serie-detail-woods">
-
           {[...(serie.composicion || [])]
-            .sort(
-              (a, b) =>
-                a.madera.xilo_id -
-                b.madera.xilo_id
-            )
+            .sort((a, b) => a.madera.xilo_id - b.madera.xilo_id)
             .map(item => (
-
-              <article
-                key={item.madera_id}
-                className="serie-detail-wood"
-              >
-
+              <article key={item.madera_id} className="serie-detail-wood">
                 <span>
-                  {String(item.madera.xilo_id)
-                    .padStart(3, '0')}
+                  {String(item.madera.xilo_id).padStart(3, '0')}
                 </span>
 
                 <div>
-                  <strong>
-                    {item.madera.nombre}
-                  </strong>
-
-                  <em>
-                    {item.madera.nombre_cientifico}
-                  </em>
+                  <strong>{item.madera.nombre}</strong>
+                  <em>{item.madera.nombre_cientifico}</em>
                 </div>
 
                 <small>
-                  {stockMaderas[item.madera_id] || 0}
-                  {' '}disp.
+                  {stockMaderas[item.madera_id] || 0} disp.
                 </small>
-
               </article>
             ))}
-
         </div>
-
       </section>
 
       {serie.modo_caja !== 'sin_caja' && (
         <section className="serie-detail-section">
-
-          <div className="page-eyebrow">
-            Caja
-          </div>
+          <div className="page-eyebrow">Caja</div>
 
           <h2>
             {serie.modo_caja === 'obligatoria'
@@ -284,9 +228,7 @@ export default function SerieDetallePage() {
                 type="radio"
                 name="caja"
                 checked={!cajaElegida}
-                onChange={() =>
-                  setCajaElegida(null)
-                }
+                onChange={() => setCajaElegida(null)}
               />
 
               <span>
@@ -297,81 +239,53 @@ export default function SerieDetallePage() {
           )}
 
           <div className="serie-detail-boxes">
-
             {cajas.map(caja => {
-              const stock =
-                stockProductos[caja.id] || 0;
-
+              const stock = stockProductos[caja.id] || 0;
               const agotada = stock === 0;
 
               return (
                 <label
                   key={caja.id}
-                  className={`serie-box-choice ${
-                    agotada ? 'disabled' : ''
-                  }`}
+                  className={`serie-box-choice ${agotada ? 'disabled' : ''}`}
                 >
-
                   <input
                     type="radio"
                     name="caja"
                     disabled={agotada}
-                    checked={
-                      cajaElegida === caja.id
-                    }
-                    onChange={() =>
-                      setCajaElegida(caja.id)
-                    }
+                    checked={cajaElegida === caja.id}
+                    onChange={() => setCajaElegida(caja.id)}
                   />
 
                   <span>
-                    <strong>
-                      {caja.nombre}
-                    </strong>
-
-                    {caja.capacidad && (
-                      <em>
-                        {caja.capacidad} piezas
-                      </em>
-                    )}
+                    <strong>{caja.nombre}</strong>
+                    {caja.capacidad && <em>{caja.capacidad} piezas</em>}
                   </span>
 
-                  <span>
-                    {stock} disponibles
-                  </span>
+                  <span>{stock} disponibles</span>
 
                   <strong>
                     {caja.precio != null
                       ? `+${Number(caja.precio).toFixed(2)} €`
                       : '0,00 €'}
                   </strong>
-
                 </label>
               );
             })}
-
           </div>
-
         </section>
       )}
 
       <section className="serie-detail-total">
-
         <div>
           <span>Total</span>
-          <strong>
-            {precioTotal.toFixed(2)} €
-          </strong>
+          <strong>{precioTotal.toFixed(2)} €</strong>
         </div>
 
         <button
           className="button dark"
           disabled={
             disponibles === 0 ||
-            (
-              serie.modo_caja === 'obligatoria' &&
-              !cajaElegida
-            )
+            (serie.modo_caja === 'obligatoria' && !cajaElegida)
           }
           onClick={() => {
             añadirAlCarrito({
@@ -397,9 +311,7 @@ export default function SerieDetallePage() {
         >
           Añadir al carrito
         </button>
-
       </section>
-
     </main>
   );
 }
