@@ -214,9 +214,10 @@ export default function PagoPage() {
 
           <button
             type="button"
-            className="button dark checkout-continue"
+            className={`button dark checkout-continue ${styles.payButton}`}
             onClick={iniciarPago}
             disabled={pagando || !condicionesAceptadas}
+            aria-disabled={pagando || !condicionesAceptadas}
           >
             {pagando ? 'Abriendo pago seguro…' : `Pagar ${Number(pedido.total).toFixed(2)} €`}
           </button>
