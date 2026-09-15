@@ -201,7 +201,7 @@ export default function ContinuarCompraPage() {
       setProcesando(false);
       await continuarAutenticado();
     } else {
-      setMensaje('Te hemos enviado un correo para confirmar tu cuenta. Al confirmar volverás a la compra.');
+      setMensaje('Cuenta creada. Te hemos enviado un correo de confirmación. Abre el enlace del mensaje para continuar con la compra. No necesitas volver a registrarte; si no lo ves, revisa también la carpeta de spam.');
       setProcesando(false);
     }
   }
@@ -261,6 +261,10 @@ export default function ContinuarCompraPage() {
           </span>
         </label>
 
+        <p style={{ margin: '0', fontSize: '0.94rem', lineHeight: 1.55 }}>
+          Si eliges <strong>Crear cuenta y continuar</strong>, te enviaremos un correo de confirmación. Tendrás que abrirlo y pulsar el enlace antes de continuar con la compra. No vuelvas a registrarte mientras esperas el mensaje.
+        </p>
+
         <div className="login-actions">
           <button type="submit" className="login-button" onClick={entrar} disabled={procesando}>
             Entrar y continuar
@@ -271,7 +275,7 @@ export default function ContinuarCompraPage() {
         </div>
       </form>
 
-      {mensaje && <p className="login-message">{mensaje}</p>}
+      {mensaje && <p className="login-message" role="status" aria-live="polite">{mensaje}</p>}
 
       <p style={{ marginTop: '28px' }}>
         <Link href="/carrito">← Volver al carrito</Link>
