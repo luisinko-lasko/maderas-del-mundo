@@ -199,7 +199,7 @@ export default function LoginPage() {
       setMensaje('Cuenta creada correctamente.');
     } else {
       setMensaje(
-        'Te hemos enviado un correo para confirmar tu cuenta. Abre el enlace del mensaje antes de iniciar sesión.'
+        'Cuenta creada. Te hemos enviado un correo de confirmación. Abre el enlace del mensaje antes de iniciar sesión. No necesitas volver a registrarte; si no lo ves, revisa también la carpeta de spam.'
       );
     }
 
@@ -764,6 +764,9 @@ export default function LoginPage() {
 
         </label>
 
+        <p style={{ margin: '0', fontSize: '0.94rem', lineHeight: 1.55 }}>
+          Si eliges <strong>Crear cuenta</strong>, te enviaremos un correo de confirmación. Tendrás que abrirlo y pulsar el enlace antes de poder entrar. No vuelvas a registrarte mientras esperas el mensaje.
+        </p>
 
         <div className="login-actions">
 
@@ -807,7 +810,7 @@ export default function LoginPage() {
 
       {mensaje && (
 
-        <p className="login-message">
+        <p className="login-message" role="status" aria-live="polite">
           {mensaje}
         </p>
 
