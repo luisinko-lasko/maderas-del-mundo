@@ -17,10 +17,9 @@ export default function AvisoLegalPage() {
 
       <h2>1. Titular del sitio</h2>
       <ul>
-        <li>Titular: Luis Rodriguez.</li>
-        <li>Nombre comercial: Maderas del Mundo.</li>
-        <li>NIF: 0975439G.</li>
-        <li>Domicilio: Gomeznarro 288, 28043 Madrid, España.</li>
+        <li>Titular: Asociación Maderas del Mundo.</li>
+        <li>NIF: en tramitación.</li>
+        <li>Domicilio social: Mercado de Nápoles, puesto 17, C/ Nápoles 53, 28043 Madrid, España.</li>
         <li>Correo electrónico: contacto@maderasdelmundo.es.</li>
         <li>Dominio: maderasdelmundo.es.</li>
       </ul>
