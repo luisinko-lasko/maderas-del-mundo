@@ -165,11 +165,18 @@ export default function CondicionesCompraPage() {
         vendedor y su domicilio constan en el <Link href="/aviso-legal">Aviso legal</Link>.
       </p>
 
-      <h2>12. Legislación aplicable</h2>
+      <h2>12. Legislación aplicable y jurisdicción</h2>
       <p>
-        Estas condiciones se rigen por la legislación española. Cuando el comprador
-        tenga la condición de consumidor, se respetarán en todo caso sus derechos
-        imperativos y las reglas de competencia territorial que resulten aplicables.
+        Estas condiciones se rigen por la legislación española.
+      </p>
+      <p>
+        Para cualquier controversia derivada de la contratación, serán competentes los
+        juzgados y tribunales que correspondan conforme a la legislación aplicable.
+      </p>
+      <p>
+        Cuando el comprador tenga la condición de consumidor o usuario, se respetarán
+        en todo caso las normas imperativas sobre competencia territorial y, en particular,
+        los fueros que legalmente le correspondan.
       </p>
 
       <h2>Modelo de desistimiento</h2>
