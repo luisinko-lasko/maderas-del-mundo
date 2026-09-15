@@ -21,7 +21,7 @@ export default function CondicionesCompraPage() {
       <div className={styles.summary}>
         <div>
           <span>Vendedor</span>
-          <strong>Luis Rodriguez · Maderas del Mundo</strong>
+          <strong>Asociación Maderas del Mundo</strong>
         </div>
         <div>
           <span>Contacto</span>
@@ -39,8 +39,9 @@ export default function CondicionesCompraPage() {
 
       <h2>1. Identidad del vendedor</h2>
       <p>
-        La actividad se desarrolla bajo el nombre comercial Maderas del Mundo.
-        Los datos identificativos completos del titular están disponibles en el{' '}
+        El vendedor es la <strong>Asociación Maderas del Mundo</strong>, con domicilio
+        social en Mercado de Nápoles, puesto 17, C/ Nápoles 53, 28043 Madrid, España.
+        Los datos identificativos y de contacto actualizados están disponibles en el{' '}
         <Link href="/aviso-legal">Aviso legal</Link>.
       </p>
 
@@ -71,16 +72,16 @@ export default function CondicionesCompraPage() {
 
       <h2>4. Proceso de compra</h2>
       <p>
-        El cliente selecciona los productos, inicia sesión, facilita o confirma sus
-        datos de entrega, revisa el resumen del pedido, acepta estas condiciones y
-        accede al pago seguro. Antes de pagar puede volver atrás para corregir los
-        datos introducidos.
+        El cliente selecciona los productos, inicia sesión o continúa como invitado,
+        facilita o confirma sus datos de entrega, revisa el resumen del pedido,
+        acepta estas condiciones y accede al pago seguro. Antes de pagar puede
+        volver atrás para corregir los datos introducidos.
       </p>
       <p>
         El contrato se formaliza en español. Maderas del Mundo conserva en su sistema
         los datos esenciales del pedido y la versión de las condiciones aceptadas.
-        El cliente puede consultar sus pedidos desde su cuenta cuando esa función
-        esté disponible para el estado correspondiente.
+        Los clientes registrados pueden consultar sus pedidos desde su cuenta cuando
+        esa función esté disponible para el estado correspondiente.
       </p>
 
       <h2>5. Disponibilidad y reserva</h2>
@@ -173,9 +174,9 @@ export default function CondicionesCompraPage() {
 
       <h2>Modelo de desistimiento</h2>
       <p>
-        A la atención de Maderas del Mundo: por la presente comunico que desisto de mi
-        contrato de venta del siguiente bien o bienes: [indicar productos]. Pedido:
-        [número de pedido]. Recibido el: [fecha]. Nombre del consumidor: [nombre].
+        A la atención de Asociación Maderas del Mundo: por la presente comunico que
+        desisto de mi contrato de venta del siguiente bien o bienes: [indicar productos].
+        Pedido: [número de pedido]. Recibido el: [fecha]. Nombre del consumidor: [nombre].
         Dirección: [dirección]. Fecha: [fecha].
       </p>
       <p>
