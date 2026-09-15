@@ -113,15 +113,20 @@ export default function ContinuarCompraPage() {
               guestToken: anterior.guestToken
             })
           });
+
           if (respuesta.ok) {
             const { pedido } = await respuesta.json();
-            if (pedido && ['reservado', 'pendiente_pago'].includes(pedido.estado) &&
-              (!pedido.reserva_hasta || new Date(pedido.reserva_hasta) > new Date())) {
+            if (
+              pedido &&
+              ['reservado', 'pendiente_pago'].includes(pedido.estado) &&
+              (!pedido.reserva_hasta || new Date(pedido.reserva_hasta) > new Date())
+            ) {
               router.replace(`/checkout/${anterior.id}`);
               return;
             }
           }
         }
+
         await cancelarInvitadoActivo(anterior);
         borrarPedidoActivo();
       }
@@ -139,7 +144,9 @@ export default function ContinuarCompraPage() {
         body: JSON.stringify({ action: 'create', carrito: datosPedido })
       });
       const resultado = await respuesta.json();
-      if (!respuesta.ok) throw new Error(resultado.error || 'No se pudo iniciar la compra como invitado');
+      if (!respuesta.ok) {
+        throw new Error(resultado.error || 'No se pudo iniciar la compra como invitado');
+      }
 
       guardarPedidoActivo(resultado.pedidoId, firma, {
         modo: 'invitado',
@@ -160,50 +167,17 @@ export default function ContinuarCompraPage() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      setMensaje(error.code === 'email_not_confirmed'
-        ? 'Debes confirmar tu correo electrónico antes de entrar.'
-        : error.message);
+      setMensaje(
+        error.code === 'email_not_confirmed'
+          ? 'Debes confirmar tu correo electrónico antes de entrar.'
+          : error.message
+      );
       setProcesando(false);
       return;
     }
 
     setProcesando(false);
     await continuarAutenticado();
-  }
-
-  async function registrarse(e) {
-    e.preventDefault();
-    setMensaje('');
-
-    if (!email) {
-      setMensaje('Escribe tu correo electrónico.');
-      return;
-    }
-    if (password.length < 8) {
-      setMensaje('La contraseña debe tener al menos 8 caracteres.');
-      return;
-    }
-
-    setProcesando(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/continuar-compra` }
-    });
-
-    if (error) {
-      setMensaje(error.message);
-      setProcesando(false);
-      return;
-    }
-
-    if (data?.session) {
-      setProcesando(false);
-      await continuarAutenticado();
-    } else {
-      setMensaje('Cuenta creada. Te hemos enviado un correo de confirmación. Abre el enlace del mensaje para continuar con la compra. No necesitas volver a registrarte; si no lo ves, revisa también la carpeta de spam.');
-      setProcesando(false);
-    }
   }
 
   useEffect(() => {
@@ -231,12 +205,18 @@ export default function ContinuarCompraPage() {
         </button>
       </div>
 
-      <h2 className="facts-title">Tengo cuenta o quiero crearla</h2>
+      <h2 className="facts-title">Ya tengo cuenta</h2>
 
-      <form className="login-form">
+      <form className="login-form" onSubmit={entrar}>
         <label>
           Correo electrónico
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
         </label>
 
         <label>
@@ -248,34 +228,44 @@ export default function ContinuarCompraPage() {
               onChange={e => setPassword(e.target.value)}
               minLength={8}
               required
+              autoComplete="current-password"
               style={{ paddingRight: '46px' }}
             />
             <button
               type="button"
               aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              title={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               onClick={() => setMostrarPassword(!mostrarPassword)}
-              style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', border: 0, background: 'transparent', cursor: 'pointer', padding: '8px' }}
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                border: 0,
+                background: 'transparent',
+                cursor: 'pointer',
+                padding: '8px'
+              }}
             >
               {mostrarPassword ? '◉' : '👁'}
             </button>
           </span>
         </label>
 
-        <p style={{ margin: '0', fontSize: '0.94rem', lineHeight: 1.55 }}>
-          Si eliges <strong>Crear cuenta y continuar</strong>, te enviaremos un correo de confirmación. Tendrás que abrirlo y pulsar el enlace antes de continuar con la compra. No vuelvas a registrarte mientras esperas el mensaje.
-        </p>
-
-        <div className="login-actions">
-          <button type="submit" className="login-button" onClick={entrar} disabled={procesando}>
-            Entrar y continuar
-          </button>
-          <button type="button" className="login-button secondary" onClick={registrarse} disabled={procesando}>
-            Crear cuenta y continuar
-          </button>
-        </div>
+        <button type="submit" className="login-button" disabled={procesando}>
+          {procesando ? 'Entrando…' : 'Entrar y continuar'}
+        </button>
       </form>
 
-      {mensaje && <p className="login-message" role="status" aria-live="polite">{mensaje}</p>}
+      <p style={{ marginTop: '22px' }}>
+        ¿No tienes cuenta? <Link href="/crear-cuenta?origen=compra">Crear cuenta</Link>
+      </p>
+
+      {mensaje && (
+        <p className="login-message" role="status" aria-live="polite">
+          {mensaje}
+        </p>
+      )}
 
       <p style={{ marginTop: '28px' }}>
         <Link href="/carrito">← Volver al carrito</Link>
