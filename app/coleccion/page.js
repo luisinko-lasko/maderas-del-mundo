@@ -232,7 +232,7 @@ export default function Coleccion() {
           <Link href="/catalogo">Explorar catálogo →</Link>
         </div>
       ) : (
-        <div className="collection-list">
+        <div className={styles.collectionGrid}>
           {maderasOrdenadas.map((item) => {
             const m = item.madera;
 
@@ -241,29 +241,28 @@ export default function Coleccion() {
             return (
               <Link
                 href={`/catalogo/${m.slug}`}
-                className="collection-row"
+                className={styles.collectionCard}
                 key={item.id}
               >
-                <span className="mini-sample">
-                  {m.imagen_url && (
+                <div className={styles.collectionImage}>
+                  {m.imagen_url ? (
                     <img
                       src={m.imagen_url}
                       alt={`Madera de ${m.nombre}`}
-                      className="wood-photo"
                     />
+                  ) : (
+                    <div className={styles.imagePlaceholder} />
                   )}
-                </span>
-
-                <div>
-                  <strong>{m.nombre}</strong>
-                  <em>{m.nombre_cientifico}</em>
+                  <span>#{String(m.xilo_id).padStart(3, '0')}</span>
                 </div>
 
-                <span>#{String(m.xilo_id).padStart(3, '0')}</span>
-
-                <span className="owned">
-                  En colección ✓
-                </span>
+                <div className={styles.collectionInfo}>
+                  <div>
+                    <strong>{m.nombre}</strong>
+                    <em>{m.nombre_cientifico}</em>
+                  </div>
+                  <small>En colección ✓</small>
+                </div>
               </Link>
             );
           })}
