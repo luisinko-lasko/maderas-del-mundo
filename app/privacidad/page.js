@@ -18,7 +18,7 @@ export default function PrivacidadPage() {
       <div className={styles.summary}>
         <div>
           <span>Responsable</span>
-          <strong>Luis Rodriguez · Maderas del Mundo</strong>
+          <strong>Asociación Maderas del Mundo</strong>
         </div>
         <div>
           <span>Contacto</span>
@@ -37,10 +37,10 @@ export default function PrivacidadPage() {
       <h2>1. Responsable del tratamiento</h2>
       <p>
         El responsable del tratamiento de los datos recogidos a través de este sitio es
-        <strong> Luis Rodriguez</strong>, que desarrolla el proyecto y actividad bajo el
-        nombre comercial <strong>Maderas del Mundo</strong>.
+        la <strong>Asociación Maderas del Mundo</strong>.
       </p>
       <ul>
+        <li>Domicilio social: Mercado de Nápoles, puesto 17, C/ Nápoles 53, 28043 Madrid, España.</li>
         <li>Correo electrónico: contacto@maderasdelmundo.es.</li>
         <li>Sitio web: maderasdelmundo.es.</li>
       </ul>
