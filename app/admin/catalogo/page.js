@@ -7,7 +7,6 @@ import { supabase } from '../../../lib/supabase';
 import styles from './catalogo.module.css';
 
 const FORM_VACIO = {
-  precio: '',
   imagen_url: '',
   imagen_commons_page: '',
   imagen_fuente: '',
@@ -126,7 +125,6 @@ export default function AdminCatalogo() {
     setMensaje('');
     setError(null);
     setForm({
-      precio: madera.precio ?? '',
       imagen_url: madera.imagen_url || '',
       imagen_commons_page: madera.imagen_commons_page || '',
       imagen_fuente: madera.imagen_fuente || '',
@@ -148,13 +146,6 @@ export default function AdminCatalogo() {
   async function guardar(e) {
     e.preventDefault();
 
-    const precio = form.precio === '' ? null : Number(form.precio);
-
-    if (precio !== null && (!Number.isFinite(precio) || precio < 0)) {
-      setError('El precio no es válido.');
-      return;
-    }
-
     setGuardando(true);
     setError(null);
     setMensaje('');
@@ -163,7 +154,6 @@ export default function AdminCatalogo() {
       'admin_actualizar_catalogo_web',
       {
         p_madera_id: editando,
-        p_precio: precio,
         p_imagen_url: form.imagen_url,
         p_imagen_commons_page: form.imagen_commons_page,
         p_imagen_fuente: form.imagen_fuente,
@@ -180,7 +170,7 @@ export default function AdminCatalogo() {
     }
 
     await cargarCatalogo();
-    setMensaje('Cambios web guardados. Los datos de la hoja MDM no se han modificado.');
+    setMensaje('Cambios de imagen guardados. Los datos de la hoja MDM no se han modificado.');
     setEditando(null);
     setForm(FORM_VACIO);
     setGuardando(false);
@@ -229,8 +219,8 @@ export default function AdminCatalogo() {
             <div className="page-eyebrow">Administración / Catálogo</div>
             <h1>Catálogo</h1>
             <p className={styles.intro}>
-              Los datos maestros proceden de la hoja MDM y son solo lectura.
-              Aquí se gestionan únicamente precio e imagen.
+              Los datos maestros, incluido el precio, proceden de la hoja MDM y son solo lectura.
+              Aquí se gestionan únicamente los datos de imagen.
             </p>
           </div>
 
@@ -274,6 +264,7 @@ export default function AdminCatalogo() {
                   <div><dt>Janka</dt><dd>{maderaEditando.janka_lbf ? `${maderaEditando.janka_lbf} lbf` : '—'}</dd></div>
                   <div><dt>Dureza</dt><dd>{maderaEditando.dureza || '—'}</dd></div>
                   <div><dt>Publicada</dt><dd>{maderaEditando.publicada ? 'Sí' : 'No'}</dd></div>
+                  <div><dt>PVP</dt><dd>{euros(maderaEditando.precio)}</dd></div>
                   <div><dt>CITES</dt><dd>{maderaEditando.cites || '—'}</dd></div>
                   <div><dt>UE</dt><dd>{maderaEditando.ue || '—'}</dd></div>
                   <div className={styles.wide}><dt>Origen</dt><dd>{maderaEditando.origen || '—'}</dd></div>
@@ -287,20 +278,9 @@ export default function AdminCatalogo() {
               <section className={styles.webData}>
                 <div className={styles.sectionTitle}>
                   <strong>Datos propios de la web</strong>
-                  <span>Editables</span>
+                  <span>Imagen · editable</span>
                 </div>
 
-                <label>
-                  Precio €
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.precio}
-                    onChange={e => setForm({ ...form, precio: e.target.value })}
-                    placeholder="Sin precio"
-                  />
-                </label>
 
                 <label>
                   URL de la imagen
@@ -364,7 +344,7 @@ export default function AdminCatalogo() {
 
                 <div className={styles.editorActions}>
                   <button className="button dark" disabled={guardando}>
-                    {guardando ? 'Guardando…' : 'Guardar cambios web'}
+                    {guardando ? 'Guardando…' : 'Guardar cambios de imagen'}
                   </button>
                 </div>
               </section>
