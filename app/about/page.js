@@ -115,7 +115,7 @@ export default function About(){
         </div>
 
         <div className="about-infographic about-infographic-wide">
-          <img src="/images/about-cortes.svg" alt="Esquema de los cortes transversal, radial y tangencial de la madera" />
+          <img src="/images/about-cortes.jpg" alt="Esquema de los cortes transversal, radial y tangencial de la madera" />
         </div>
       </section>
 
@@ -169,7 +169,7 @@ export default function About(){
           </div>
 
           <div className="about-infographic">
-            <img src="/images/about-densidad.svg" alt="Comparación de densidad con el agua usando Secuoya roja número 56 y Quebracho rojo número 48" />
+            <img src="/images/about-densidad.jpg" alt="Comparación de densidad con el agua usando Secuoya roja número 56 y Quebracho rojo número 48" />
           </div>
           <p className="property-footnote">
             Dos ejemplos de nuestra colección: <strong>Secuoya roja (#56)</strong>, con una densidad
@@ -197,7 +197,7 @@ export default function About(){
           </div>
 
           <div className="about-infographic">
-            <img src="/images/about-janka.svg" alt="Esquema del ensayo Janka con ejemplos de Abeto blanco número 11, Palosanto India número 59 y Quebracho rojo número 48" />
+            <img src="/images/about-janka.jpg" alt="Esquema del ensayo Janka con ejemplos de Abeto blanco número 11, Palosanto India número 59 y Quebracho rojo número 48" />
           </div>
           <p className="property-footnote">
             En nuestra colección, por ejemplo, el <strong>Abeto blanco (#11)</strong> tiene 320 lbf
