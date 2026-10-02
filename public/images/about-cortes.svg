@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+<title id="title">Los tres cortes de la madera</title><desc id="desc">Esquema de corte transversal, radial y tangencial.</desc>
+<rect width="1200" height="420" fill="#eeeae0"/>
+<g font-family="Arial,Helvetica,sans-serif" fill="#161714">
+  <g transform="translate(40,42)">
+    <circle cx="140" cy="150" r="112" fill="#a96f43" stroke="#61402c" stroke-width="22"/>
+    <circle cx="140" cy="150" r="86" fill="none" stroke="#6e472e" stroke-width="3"/>
+    <circle cx="140" cy="150" r="62" fill="none" stroke="#6e472e" stroke-width="3"/>
+    <circle cx="140" cy="150" r="38" fill="none" stroke="#6e472e" stroke-width="3"/>
+    <path d="M140 38V262M28 150H252" stroke="#3f2d22" stroke-width="2" opacity=".45"/>
+    <text x="0" y="305" font-size="22" font-family="Georgia,serif">Cómo se orientan los cortes</text>
+    <text x="0" y="335" font-size="15" fill="#6f7069">respecto a los anillos y a las fibras</text>
+  </g>
+  <g transform="translate(360,55)">
+    <rect x="0" y="35" width="225" height="190" rx="2" fill="#b67d4e" stroke="#8b5c3a"/>
+    <path d="M16 60c50-35 100 35 193 0M16 95c55-30 110 30 193 0M16 130c45-25 105 25 193 0M16 165c55-30 115 30 193 0" fill="none" stroke="#68452f" stroke-width="3" opacity=".75"/>
+    <text x="0" y="270" font-size="28" font-family="Georgia,serif">Transversal o testa</text>
+    <text x="0" y="300" font-size="15" fill="#6f7069">Perpendicular a las fibras.</text>
+    <text x="0" y="323" font-size="15" fill="#6f7069">Se leen los anillos de crecimiento.</text>
+  </g>
+  <g transform="translate(650,55)">
+    <rect x="0" y="35" width="225" height="190" rx="2" fill="#c18c5e" stroke="#8b5c3a"/>
+    <path d="M25 42V218M55 42V218M90 42V218M128 42V218M165 42V218M202 42V218" stroke="#754b31" stroke-width="4" opacity=".55"/>
+    <text x="0" y="270" font-size="28" font-family="Georgia,serif">Radial</text>
+    <text x="0" y="300" font-size="15" fill="#6f7069">Corte hacia el centro del tronco.</text>
+    <text x="0" y="323" font-size="15" fill="#6f7069">Suele mostrar vetas más rectas.</text>
+  </g>
+  <g transform="translate(940,55)">
+    <rect x="0" y="35" width="225" height="190" rx="2" fill="#b77b4d" stroke="#8b5c3a"/>
+    <path d="M15 85c35-65 75-65 105 0s70 65 90 0M15 150c35-65 75-65 105 0s70 65 90 0" fill="none" stroke="#67422c" stroke-width="5" opacity=".72"/>
+    <text x="0" y="270" font-size="28" font-family="Georgia,serif">Tangencial</text>
+    <text x="0" y="300" font-size="15" fill="#6f7069">Tangente a los anillos.</text>
+    <text x="0" y="323" font-size="15" fill="#6f7069">Aparecen arcos y vetas más marcadas.</text>
+  </g>
+</g>
+</svg>
