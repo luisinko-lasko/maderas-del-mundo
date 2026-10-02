@@ -242,6 +242,13 @@ export default function About(){
         </div>
       </section>
 
+      <style>{`
+        .about-properties{grid-template-columns:1fr}
+        .about-properties .property-block{min-height:auto;padding:9vh 4vw 10vh}
+        .about-properties .property-copy{max-width:760px}
+        .about-properties .about-infographic{width:min(100%,1200px);margin-left:auto;margin-right:auto}
+      `}</style>
+
       <section className="about-closing">
         <div className="page-eyebrow">Una colección que seguirá cambiando</div>
         <h2>Siempre habrá<br/>otra madera por descubrir.</h2>
