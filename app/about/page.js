@@ -114,29 +114,8 @@ export default function About(){
           </p>
         </div>
 
-        <div className="cuts-grid">
-          <article className="cut-card">
-            <div className="cut-visual cut-end">
-              <div className="rings"></div>
-            </div>
-            <div className="cut-index">A</div>
-            <h3>Transversal o testa</h3>
-            <p>Perpendicular a las fibras. Es el corte donde mejor se leen los anillos de crecimiento.</p>
-          </article>
-
-          <article className="cut-card">
-            <div className="cut-visual cut-radial"><div></div></div>
-            <div className="cut-index">B</div>
-            <h3>Radial</h3>
-            <p>Se realiza aproximadamente en dirección a los radios del tronco. Suele dar una veta más recta.</p>
-          </article>
-
-          <article className="cut-card">
-            <div className="cut-visual cut-tangent"><div></div></div>
-            <div className="cut-index">C</div>
-            <h3>Tangencial</h3>
-            <p>El plano es tangente a los anillos de crecimiento. Aparecen dibujos y arcos más marcados.</p>
-          </article>
+        <div className="about-infographic about-infographic-wide">
+          <img src="/images/about-cortes.svg" alt="Esquema de los cortes transversal, radial y tangencial de la madera" />
         </div>
       </section>
 
@@ -189,15 +168,13 @@ export default function About(){
             </p>
           </div>
 
-          <div className="density-visual">
-            <div className="water-line"><span>1000 kg/m³ · agua</span></div>
-            <div className="float-block"><span>Balsa<br/><small>muy ligera</small></span></div>
-            <div className="sink-block"><span>Guayacán<br/><small>muy denso</small></span></div>
+          <div className="about-infographic">
+            <img src="/images/about-densidad.svg" alt="Comparación de densidad con el agua usando Secuoya roja número 56 y Quebracho rojo número 48" />
           </div>
           <p className="property-footnote">
-            La balsa está entre las maderas comerciales más ligeras; el guayacán o lignum vitae,
-            entre las más densas. No existe un único valor absoluto: cambia con la especie,
-            la humedad y la muestra medida.
+            Dos ejemplos de nuestra colección: <strong>Secuoya roja (#56)</strong>, con una densidad
+            de 415 kg/m³, y <strong>Quebracho rojo (#48)</strong>, con 1235 kg/m³. No existe un único
+            valor absoluto: cambia con la especie, la humedad y la muestra medida.
           </p>
         </div>
 
@@ -219,12 +196,14 @@ export default function About(){
             </p>
           </div>
 
-          <div className="janka-visual" aria-label="Esquema simplificado del ensayo Janka">
-            <div className="janka-press"></div>
-            <div className="janka-ball"></div>
-            <div className="janka-board"></div>
-            <div className="janka-caption">Bola de acero Ø 11,28 mm</div>
+          <div className="about-infographic">
+            <img src="/images/about-janka.svg" alt="Esquema del ensayo Janka con ejemplos de Abeto blanco número 11, Palosanto India número 59 y Quebracho rojo número 48" />
           </div>
+          <p className="property-footnote">
+            En nuestra colección, por ejemplo, el <strong>Abeto blanco (#11)</strong> tiene 320 lbf
+            (≈ 1423 N), el <strong>Palosanto de la India (#59)</strong> 2350 lbf (≈ 10453 N) y el
+            <strong> Quebracho rojo (#48)</strong> 4570 lbf (≈ 20328 N).
+          </p>
         </div>
       </section>
 
@@ -245,9 +224,14 @@ export default function About(){
             comercio internacional está sujeto a controles y documentación específicos.
           </p>
           <p>
-            Cuando una especie está afectada por CITES, conservamos y exigimos la documentación
-            de procedencia que corresponda. Legalidad y trazabilidad no son un añadido: son parte
-            del criterio con el que incorporamos madera a la colección.
+            Cuando una especie está afectada por CITES, pedimos la documentación de procedencia
+            que corresponda antes de incorporarla a la colección. Legalidad y trazabilidad no son
+            un añadido: forman parte del criterio con el que seleccionamos la madera.
+          </p>
+          <p>
+            <a href="https://cites.org/esp" target="_blank" rel="noreferrer" className="about-cites-link">
+              Más información en la web oficial de CITES →
+            </a>
           </p>
 
           <div className="legal-steps">
