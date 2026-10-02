@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 440" role="img" aria-labelledby="title desc">
+<title id="title">Densidad de la madera</title><desc id="desc">Comparación con el agua usando especies de la colección.</desc>
+<rect width="820" height="440" fill="#eeeae0"/>
+<g font-family="Arial,Helvetica,sans-serif" fill="#161714">
+  <text x="42" y="48" font-size="15" letter-spacing="2" fill="#6f7069">DENSIDAD</text>
+  <text x="42" y="88" font-family="Georgia,serif" font-size="34">El agua como referencia</text>
+  <rect x="52" y="145" width="716" height="218" rx="4" fill="#dfe7e5" stroke="#9aa7a4"/>
+  <rect x="52" y="212" width="716" height="151" fill="#b9d1d5" opacity=".72"/>
+  <line x1="52" y1="212" x2="768" y2="212" stroke="#657f84" stroke-width="2"/>
+  <text x="585" y="200" font-size="14" fill="#52696d">1000 kg/m³ · agua</text>
+
+  <g transform="translate(160,170)">
+    <rect width="170" height="84" rx="3" fill="#c99b62" stroke="#8e6a43"/>
+    <path d="M8 20c35-18 70 20 154 0M8 45c40-16 85 18 154 0" stroke="#8b603a" fill="none" stroke-width="3" opacity=".55"/>
+    <text x="0" y="128" font-size="20" font-family="Georgia,serif">Secuoya roja · #56</text>
+    <text x="0" y="154" font-size="15" fill="#6f7069">415 kg/m³ · flota</text>
+  </g>
+
+  <g transform="translate(505,246)">
+    <rect width="130" height="105" rx="3" fill="#55372a" stroke="#2e211b"/>
+    <path d="M10 22c25-10 60 12 110 0M10 52c30-12 70 12 110 0M10 80c35-12 65 10 110 0" stroke="#7a5540" fill="none" stroke-width="3"/>
+    <text x="-38" y="142" font-size="20" font-family="Georgia,serif">Quebracho rojo · #48</text>
+    <text x="-4" y="168" font-size="15" fill="#6f7069">1235 kg/m³ · se hunde</text>
+  </g>
+</g>
+</svg>
