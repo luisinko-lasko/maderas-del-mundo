@@ -58,6 +58,15 @@ export default async function Ficha({ params }) {
 
   if (error || !m) notFound();
 
+  const { data: piezasDisponibles, error: stockError } = await supabase
+    .from('piezas')
+    .select('id')
+    .eq('madera_id', m.id)
+    .eq('estado', 'disponible')
+    .limit(1);
+
+  const tieneStock = !stockError && piezasDisponibles?.length > 0;
+
 
   const tieneProteccion =
     m.cites ||
@@ -134,6 +143,14 @@ export default async function Ficha({ params }) {
 
         </div>
 
+
+        {tieneStock && (
+          <div style={{ margin: '24px 0' }}>
+            <Link href={`/tienda/madera/${m.slug}`} className="button dark">
+              Comprar ahora
+            </Link>
+          </div>
+        )}
 
         <dl className="facts ficha-identidad">
 
