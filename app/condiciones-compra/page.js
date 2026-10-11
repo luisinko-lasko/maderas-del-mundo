@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import styles from '../privacidad/privacidad.module.css';
 import { CONDICIONES_COMPRA_VERSION } from '../../lib/legal';
+import CondicionesVenta from '../../components/CondicionesVenta';
 
 export const metadata = {
   title: 'Condiciones de compra · Maderas del mundo'
@@ -66,8 +67,9 @@ export default function CondicionesCompraPage() {
         resulte aplicable. El pago online se realiza mediante Stripe.
       </p>
       <p>
-        Mientras el proceso de compra no muestre un coste de entrega separado,
-        no se cargará al cliente ningún importe adicional por ese concepto.
+        Desde 10 piezas se aplica un descuento del 10% y desde 20 piezas del 20%.
+        Se aplica un único descuento al importe de las piezas y series, excluyendo
+        cajas y gastos de envío. Las piezas incluidas en las series también cuentan.
       </p>
 
       <h2>4. Proceso de compra</h2>
@@ -97,6 +99,7 @@ export default function CondicionesCompraPage() {
       </p>
 
       <h2>6. Entrega</h2>
+      <CondicionesVenta />
       <p>
         El cliente podrá elegir las modalidades de entrega que estén disponibles en
         el proceso de compra. Cuando exista envío a domicilio, la dirección facilitada

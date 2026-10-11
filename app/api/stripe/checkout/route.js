@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+import { lineasStripe, comprobarImporteStripe } from '../../../../lib/venta';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -65,7 +67,7 @@ export async function POST(request) {
         id,
         user_id,
         estado,
-        total,
+        total, subtotal, descuento, descuento_porcentaje, gastos_envio, numero_piezas, venta_version, entrega, pais_entrega, codigo_postal_entrega,
         email_entrega,
         reserva_hasta,
         condiciones_aceptadas_at,
@@ -75,7 +77,7 @@ export async function POST(request) {
         pedido_lineas (
           nombre,
           cantidad,
-          precio_unitario
+          precio_unitario, precio_caja_unitario
         )
       `)
       .eq('id', pedidoId)
@@ -122,6 +124,11 @@ export async function POST(request) {
       );
     }
 
+    let line_items;
+    try { line_items = lineasStripe(pedido); } catch (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     const emailCliente = pedido.email_entrega || user.email || undefined;
 
     async function prepararPago() {
@@ -164,6 +171,7 @@ export async function POST(request) {
       );
 
       if (existente.payment_status === 'paid') {
+        comprobarImporteStripe(existente, pedido);
         const { error: confirmarError } = await supabaseAdmin.rpc(
           'confirmar_pago_stripe',
           { p_pedido_id: pedido.id }
@@ -180,7 +188,7 @@ export async function POST(request) {
         const emailSesion = existente.customer_email?.trim().toLowerCase() || null;
         const emailEsperado = emailCliente?.trim().toLowerCase() || null;
 
-        if (emailEsperado && emailSesion === emailEsperado) {
+        if (emailEsperado && emailSesion === emailEsperado && existente.amount_total === Math.round(Number(pedido.total) * 100) && existente.metadata?.condiciones_version === CONDICIONES_COMPRA_VERSION) {
           return NextResponse.json({ url: existente.url });
         }
 
@@ -204,16 +212,8 @@ export async function POST(request) {
       new Date(preparacion.expires_at).getTime() / 1000
     );
 
-    const line_items = pedido.pedido_lineas.map(linea => ({
-      quantity: linea.cantidad,
-      price_data: {
-        currency: 'eur',
-        unit_amount: Math.round(Number(linea.precio_unitario) * 100),
-        product_data: {
-          name: linea.nombre
-        }
-      }
-    }));
+
+    const firmaPago = createHash('sha256').update(JSON.stringify({ line_items, emailCliente })).digest('hex').slice(0, 24);
 
     const session = await stripe.checkout.sessions.create(
       {
@@ -235,7 +235,7 @@ export async function POST(request) {
         }
       },
       {
-        idempotencyKey: `pedido-${pedido.id}-${expiresAt}-email-v1`
+        idempotencyKey: `pedido-${pedido.id}-${expiresAt}-venta-${firmaPago}`
       }
     );
 

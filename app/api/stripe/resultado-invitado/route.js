@@ -1,3 +1,4 @@
+import { comprobarImporteStripe } from '../../../../lib/venta';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createHash } from 'crypto';
@@ -39,7 +40,7 @@ export async function POST(request) {
     const tokenHash = hashToken(guestToken);
     const { data: pedidoPropio, error: propioError } = await supabaseAdmin
       .from('pedidos')
-      .select('id, stripe_checkout_session_id')
+      .select('id, total, stripe_checkout_session_id')
       .eq('id', pedidoId)
       .eq('es_invitado', true)
       .eq('guest_token_hash', tokenHash)
@@ -52,6 +53,8 @@ export async function POST(request) {
     if (pedidoPropio.stripe_checkout_session_id && pedidoPropio.stripe_checkout_session_id !== session.id) {
       return NextResponse.json({ error: 'La sesión de pago no corresponde al pedido actual' }, { status: 400 });
     }
+
+    comprobarImporteStripe(session, pedidoPropio);
 
     const { error: confirmacionError } = await supabaseAdmin.rpc(
       'confirmar_pago_stripe',

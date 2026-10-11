@@ -13,6 +13,8 @@ import {
   eliminarDelCarrito
 } from '../../lib/carrito';
 import { supabase } from '../../lib/supabase';
+import CondicionesVenta from '../../components/CondicionesVenta';
+import { porcentajeDescuento, euros } from '../../lib/venta';
 
 export default function CarritoPage() {
   const router = useRouter();
@@ -105,6 +107,11 @@ export default function CarritoPage() {
     0
   ), [carrito]);
 
+  const piezas = carrito.reduce((n, item) => n + item.cantidad * (item.tipo === 'madera' ? 1 : Number(item.numero_maderas || 0)), 0);
+  const porcentaje = porcentajeDescuento(piezas);
+  const base = carrito.reduce((n, item) => n + item.cantidad * (item.tipo === 'madera' ? Number(item.precio || 0) : Number(item.precio_base ?? (Number(item.precio || 0) - Number(item.caja?.precio || 0)))), 0);
+  const descuento = Math.round(base * porcentaje) / 100;
+
   return (
     <main className="cart-page">
       <div className="cart-heading">
@@ -161,12 +168,14 @@ export default function CarritoPage() {
 
           <section className="cart-summary">
             <div className="cart-summary-total">
-              <span>Total</span>
-              <strong>{total.toFixed(2)} €</strong>
+              <span>Artículos · {piezas} piezas</span>
+              <strong>{euros(total)}</strong>
             </div>
 
+            {descuento > 0 && <p>Descuento {porcentaje}%: −{euros(descuento)} · Artículos con descuento: {euros(total - descuento)}</p>}
+            <CondicionesVenta />
             <div className="cart-summary-actions">
-              <p>Los gastos de envío se calcularán más adelante.</p>
+              <p>El total definitivo, incluido el envío si lo eliges, se mostrará antes de pagar.</p>
               <button className="button dark" onClick={continuarPedido} disabled={procesando}>
                 {procesando ? 'Comprobando disponibilidad…' : 'Continuar pedido'}
               </button>

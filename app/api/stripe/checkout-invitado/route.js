@@ -1,3 +1,4 @@
+import { lineasStripe, comprobarImporteStripe } from '../../../../lib/venta';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createHash } from 'crypto';
@@ -28,10 +29,10 @@ export async function POST(request) {
     const { data: pedido, error: pedidoError } = await supabaseAdmin
       .from('pedidos')
       .select(`
-        id, estado, total, email_entrega, reserva_hasta,
+        id, estado, total, subtotal, descuento, descuento_porcentaje, gastos_envio, numero_piezas, venta_version, entrega, pais_entrega, codigo_postal_entrega, email_entrega, reserva_hasta,
         condiciones_aceptadas_at, condiciones_version,
         stripe_checkout_session_id, stripe_checkout_expires_at,
-        pedido_lineas (nombre, cantidad, precio_unitario)
+        pedido_lineas (nombre, cantidad, precio_unitario, precio_caja_unitario)
       `)
       .eq('id', pedidoId)
       .eq('es_invitado', true)
@@ -55,6 +56,11 @@ export async function POST(request) {
         { error: 'Debes aceptar las condiciones de compra antes de pagar' },
         { status: 400 }
       );
+    }
+
+    let line_items;
+    try { line_items = lineasStripe(pedido); } catch (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     const emailCliente = pedido.email_entrega || undefined;
@@ -94,6 +100,7 @@ export async function POST(request) {
       const existente = await stripe.checkout.sessions.retrieve(preparacion.session_id);
 
       if (existente.payment_status === 'paid') {
+        comprobarImporteStripe(existente, pedido);
         const { error: confirmarError } = await supabaseAdmin.rpc(
           'confirmar_pago_stripe',
           { p_pedido_id: pedido.id }
@@ -108,7 +115,7 @@ export async function POST(request) {
       if (existente.status === 'open' && existente.url) {
         const emailSesion = existente.customer_email?.trim().toLowerCase() || null;
         const emailEsperado = emailCliente?.trim().toLowerCase() || null;
-        if (emailEsperado && emailSesion === emailEsperado) {
+        if (emailEsperado && emailSesion === emailEsperado && existente.amount_total === Math.round(Number(pedido.total) * 100) && existente.metadata?.condiciones_version === CONDICIONES_COMPRA_VERSION) {
           return NextResponse.json({ url: existente.url });
         }
 
@@ -124,14 +131,8 @@ export async function POST(request) {
     }
 
     const expiresAt = Math.floor(new Date(preparacion.expires_at).getTime() / 1000);
-    const line_items = (pedido.pedido_lineas || []).map(linea => ({
-      quantity: linea.cantidad,
-      price_data: {
-        currency: 'eur',
-        unit_amount: Math.round(Number(linea.precio_unitario) * 100),
-        product_data: { name: linea.nombre }
-      }
-    }));
+
+    const firmaPago = createHash('sha256').update(JSON.stringify({ line_items, emailCliente })).digest('hex').slice(0, 24);
 
     const session = await stripe.checkout.sessions.create(
       {
@@ -147,7 +148,7 @@ export async function POST(request) {
           condiciones_version: CONDICIONES_COMPRA_VERSION
         }
       },
-      { idempotencyKey: `pedido-${pedido.id}-${expiresAt}-guest-email-v1` }
+      { idempotencyKey: `pedido-${pedido.id}-${expiresAt}-guest-venta-${firmaPago}` }
     );
 
     const { error: guardarError } = await supabaseAdmin

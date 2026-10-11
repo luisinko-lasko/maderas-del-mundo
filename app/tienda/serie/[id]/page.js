@@ -303,7 +303,7 @@ export default function SerieDetallePage() {
                     precio: precioCaja
                   }
                 : null,
-              numero_maderas: serie.composicion?.length || 0
+              numero_maderas: (serie.composicion || []).reduce((n, c) => n + Number(c.cantidad || 1), 0)
             });
 
             router.push('/carrito');

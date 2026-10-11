@@ -7,6 +7,8 @@ import { supabase } from '../../../../lib/supabase';
 import { borrarPedidoActivo, leerPedidoActivo } from '../../../../lib/carrito';
 import { CONDICIONES_COMPRA_VERSION } from '../../../../lib/legal';
 import styles from './pago.module.css';
+import ResumenImportes from '../../../../components/ResumenImportes';
+import { VENTA_VERSION } from '../../../../lib/venta';
 
 export default function PagoPage() {
   const { id } = useParams();
@@ -78,7 +80,7 @@ export default function PagoPage() {
 
       const reservaVencida = !pedidoData.reserva_hasta || new Date(pedidoData.reserva_hasta) <= new Date();
 
-      if (pedidoData.estado === 'reservado' && !reservaVencida) {
+      if ((pedidoData.estado === 'reservado' || pedidoData.venta_version !== VENTA_VERSION) && !reservaVencida) {
         router.replace(`/checkout/${id}`);
         return;
       }
@@ -236,10 +238,7 @@ export default function PagoPage() {
               </div>
             ))}
           </div>
-          <div className="checkout-total">
-            <span>Total</span>
-            <strong>{Number(pedido.total).toFixed(2)} €</strong>
-          </div>
+          <ResumenImportes pedido={pedido} />
         </aside>
       </div>
     </main>

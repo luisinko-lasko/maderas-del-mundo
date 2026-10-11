@@ -1,3 +1,4 @@
+import { comprobarImporteStripe } from '../../../../lib/venta';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -88,7 +89,7 @@ export async function POST(request) {
     // operación administrativa. RLS limita esta lectura al propio usuario.
     const { data: pedidoPropio, error: pedidoPropioError } = await supabase
       .from('pedidos')
-      .select('id, stripe_checkout_session_id')
+      .select('id, total, stripe_checkout_session_id')
       .eq('id', pedidoId)
       .single();
 
@@ -108,6 +109,8 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    comprobarImporteStripe(session, pedidoPropio);
 
     // Segunda vía de confirmación además del webhook. La función de base
     // de datos es idempotente, incluso si el pedido ya ha avanzado en
