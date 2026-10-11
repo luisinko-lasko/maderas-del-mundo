@@ -166,14 +166,15 @@ export default function CarritoPage() {
             ))}
           </section>
 
+          <CondicionesVenta />
+
           <section className="cart-summary">
             <div className="cart-summary-total">
               <span>Artículos · {piezas} piezas</span>
               <strong>{euros(total)}</strong>
+              {descuento > 0 && <p>Descuento {porcentaje}%: −{euros(descuento)} · Artículos con descuento: {euros(total - descuento)}</p>}
             </div>
 
-            {descuento > 0 && <p>Descuento {porcentaje}%: −{euros(descuento)} · Artículos con descuento: {euros(total - descuento)}</p>}
-            <CondicionesVenta />
             <div className="cart-summary-actions">
               <p>El total definitivo, incluido el envío si lo eliges, se mostrará antes de pagar.</p>
               <button className="button dark" onClick={continuarPedido} disabled={procesando}>
