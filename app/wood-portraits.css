@@ -1,0 +1,45 @@
+/* Fotografías de las piezas: proporción 2:3 en catálogo y tienda.
+   Los JPG de cada madera se almacenan verticales, sin rotaciones ni recortes. */
+
+.catalog-grid .wood-sample {
+  height: auto;
+  aspect-ratio: 2 / 3;
+  background: rgba(23, 37, 28, .06);
+}
+
+.catalog-grid .wood-sample .wood-photo,
+.shop-individual-image img,
+.wood-shop-image img,
+.detail-sample .large-wood .wood-photo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.shop-individual-image {
+  aspect-ratio: 2 / 3;
+}
+
+.wood-shop-image {
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  max-width: 540px;
+}
+
+.detail-sample .large-wood {
+  height: auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 540px;
+  aspect-ratio: 2 / 3;
+  margin-inline: auto;
+}
+
+@media (max-width: 850px) {
+  .wood-shop-image {
+    aspect-ratio: 2 / 3;
+    position: static;
+  }
+}
