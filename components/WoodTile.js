@@ -3,9 +3,6 @@ import Link from 'next/link';
 export default function WoodTile({ madera }) {
   const tieneFoto = Boolean(madera.imagenUrl);
   const imagenMostrada = madera.imagenUrl || '/sin-imagen-madera.jpg';
-  const necesitaRecorte =
-    tieneFoto &&
-    (/Xyloth|Collection_de_bois|Cirad/i.test(madera.imagenUrl) || madera.xiloId === 4);
 
   return (
     <Link href={`/catalogo/${madera.slug}`} className="wood-card">
@@ -14,14 +11,6 @@ export default function WoodTile({ madera }) {
           src={imagenMostrada}
           alt={tieneFoto ? `Madera de ${madera.nombre}` : 'Imagen pendiente de la madera'}
           className="wood-photo"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            transform: necesitaRecorte ? 'scale(1.34)' : 'none',
-            transformOrigin: 'center center',
-          }}
         />
 
         <span>{String(madera.xiloId).padStart(3, '0')}</span>
