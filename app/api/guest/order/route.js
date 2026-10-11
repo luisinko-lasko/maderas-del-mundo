@@ -26,13 +26,13 @@ async function obtenerPedido(pedidoId, guestToken) {
   const { data, error } = await supabaseAdmin
     .from('pedidos')
     .select(`
-      id, estado, total, reserva_hasta, entrega,
+      id, estado, total, subtotal, descuento, descuento_porcentaje, gastos_envio, numero_piezas, venta_version, reserva_hasta, entrega,
       nombre_entrega, apellidos_entrega, email_entrega, telefono_entrega,
       direccion_entrega, codigo_postal_entrega, poblacion_entrega,
       provincia_entrega, pais_entrega,
       condiciones_aceptadas_at, condiciones_version,
       stripe_checkout_session_id, stripe_checkout_expires_at,
-      pedido_lineas (id, tipo, nombre, cantidad, precio_unitario)
+      pedido_lineas (id, tipo, nombre, cantidad, precio_unitario, precio_caja_unitario)
     `)
     .eq('id', pedidoId)
     .eq('es_invitado', true)
@@ -176,7 +176,7 @@ export async function POST(request) {
         .eq('id', pedidoId)
         .eq('guest_token_hash', hashToken(guestToken));
 
-      if (error) throw error;
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 });
       return NextResponse.json({ ok: true });
     }
 
@@ -200,7 +200,7 @@ export async function POST(request) {
         })
         .eq('id', pedidoId)
         .eq('guest_token_hash', hashToken(guestToken));
-      if (error) throw error;
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 });
       return NextResponse.json({ ok: true });
     }
 
@@ -209,7 +209,7 @@ export async function POST(request) {
         p_pedido_id: pedidoId,
         p_guest_token_hash: hashToken(guestToken)
       });
-      if (error) throw error;
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 });
       return NextResponse.json({ ok: true });
     }
 

@@ -1,3 +1,4 @@
+import { comprobarImporteStripe } from '../../../../lib/venta';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -61,13 +62,15 @@ export async function POST(request) {
 
         const { data: pedido, error: pedidoError } = await supabaseAdmin
           .from('pedidos')
-          .select('id, estado, stripe_checkout_session_id')
+          .select('id, estado, total, stripe_checkout_session_id')
           .eq('id', pedidoId)
           .single();
 
         if (pedidoError || !pedido) {
           throw pedidoError || new Error('Pedido no encontrado');
         }
+
+        comprobarImporteStripe(session, pedido);
 
         if (
           pedido.stripe_checkout_session_id &&

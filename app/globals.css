@@ -3401,3 +3401,7 @@
 .about-cites-link:hover{
   border-bottom-color:currentColor;
 }
+
+.sale-conditions{margin:24px 0;padding:20px;border:1px solid var(--line,#ddd);font-size:14px;line-height:1.6}
+.sale-conditions p{margin:0 0 10px}.sale-conditions p:last-child{margin-bottom:0}
+.sale-conditions a{text-decoration:underline}

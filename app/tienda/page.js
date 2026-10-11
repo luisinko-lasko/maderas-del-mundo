@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import CondicionesVenta from '../../components/CondicionesVenta';
 
 export default function TiendaPage() {
   const [series, setSeries] = useState([]);
@@ -178,6 +179,8 @@ export default function TiendaPage() {
           o regalar una colección.
         </p>
       </section>
+
+      <CondicionesVenta />
 
       {error && (
         <div className="shop-error">

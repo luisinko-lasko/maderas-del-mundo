@@ -1,5 +1,8 @@
 'use client';
 
+import CondicionesVenta from '../../../components/CondicionesVenta';
+import ResumenImportes from '../../../components/ResumenImportes';
+import { errorEnvio } from '../../../lib/venta';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -142,6 +145,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (form.entrega === 'envio') {
+      const problema = errorEnvio(Number(pedido.numero_piezas), form.pais, form.codigo_postal);
+      if (problema) { setError(problema); return; }
+    }
+
     setGuardando(true);
 
     if (esInvitado) {
@@ -207,7 +215,7 @@ export default function CheckoutPage() {
             <div className="checkout-delivery-options">
               <label>
                 <input type="radio" name="entrega" value="envio" checked={form.entrega === 'envio'} onChange={cambiar} />
-                <span><strong>Envío a domicilio</strong><small>Enviaremos el pedido a la dirección indicada.</small></span>
+                <span><strong>Envío a domicilio</strong><small>Península española · mínimo 5 piezas.</small></span>
               </label>
               <label>
                 <input type="radio" name="entrega" value="recogida" checked={form.entrega === 'recogida'} onChange={cambiar} />
@@ -260,10 +268,8 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="checkout-total">
-            <span>Total provisional</span>
-            <strong>{Number(pedido.total).toFixed(2)} €</strong>
-          </div>
+          <ResumenImportes pedido={pedido} entrega={form.entrega} provisional />
+          <CondicionesVenta />
           <p className="checkout-note">Las piezas de este pedido están reservadas temporalmente.</p>
           <Link href="/tienda">← Volver a la tienda</Link>
         </aside>
