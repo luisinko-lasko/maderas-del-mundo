@@ -84,9 +84,9 @@ export default function About(){
               buscamos convertirla en un producto industrial idéntico al milímetro.
             </p>
             <p>
-              Las piezas se preparan siempre <strong>a veta</strong>, de forma que la cara
-              principal muestre de la manera más clara posible el dibujo y la estructura
-              característica de la madera.
+              Las piezas se preparan habitualmente en <strong>sección radial</strong>,
+              a favor de la veta, para que su cara principal permita apreciar con claridad
+              el dibujo y la estructura característica de cada madera.
             </p>
           </div>
 
@@ -117,6 +117,10 @@ export default function About(){
         <div className="about-infographic about-infographic-wide">
           <img src="/images/about-cortes.jpg" alt="Esquema de los cortes transversal, radial y tangencial de la madera" />
         </div>
+        <p className="property-footnote">
+          Nuestras piezas están hechas habitualmente en <strong>sección radial</strong>,
+          a favor de la veta. Así se aprecia mejor el dibujo longitudinal de la madera.
+        </p>
       </section>
 
       <section className="about-engraving">
