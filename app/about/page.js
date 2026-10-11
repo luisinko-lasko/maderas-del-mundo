@@ -114,10 +114,10 @@ export default function About(){
           </p>
         </div>
 
-        <div className="about-infographic about-infographic-wide">
-          <img src="/images/about-cortes.jpg" alt="Esquema de los cortes transversal, radial y tangencial de la madera" />
+        <div className="about-infographic about-infographic-wide" style={{maxWidth:'850px', background:'#fff', border:'none'}}>
+          <img src="/images/about-cortes-secciones.webp" alt="Secciones transversal, radial y tangencial de un tronco: anillos de crecimiento, veta recta y veta en catedrales" />
         </div>
-        <p className="property-footnote">
+        <p className="property-footnote" style={{maxWidth:'850px', margin:'22px auto 0', fontSize:'14px'}}> 
           Nuestras piezas están hechas habitualmente en <strong>sección radial</strong>,
           a favor de la veta. Así se aprecia mejor el dibujo longitudinal de la madera.
         </p>
