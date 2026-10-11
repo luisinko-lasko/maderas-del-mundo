@@ -1,40 +1,22 @@
-# Maderas del mundo — v1
+# Maderas del Mundo
 
-Primera maqueta funcional del proyecto. Es una aplicación Next.js sin base de datos todavía: todos los datos son de demostración.
+Aplicación de catálogo, tienda y administración de la Asociación Maderas del Mundo. Usa Next.js App Router, Supabase para datos y cuentas, Stripe Checkout para pago y Brevo para correos transaccionales. Producción: https://www.maderasdelmundo.es.
 
-## Arrancar en un Mac
+## Manual vigente
 
-Necesitas Node.js 20 o superior.
+[Manual de administración y mantenimiento — Versión 1](docs/manual-maderas-del-mundo.md) describe plataformas, hoja MDM, macros, fotos, inventario, series, compras, usuarios, despliegue, copias y resolución de errores. [Historial del manual](docs/manual-historial.md).
 
-1. Descomprime esta carpeta.
-2. Abre Terminal y entra en la carpeta, por ejemplo:
-   `cd ~/Downloads/maderas-del-mundo-v1`
-3. Instala dependencias:
-   `npm install`
-4. Arranca la web:
-   `npm run dev`
-5. Abre en Safari:
-   `http://localhost:3000`
+`AGENTS.md` exige actualizar los capítulos afectados junto con los cambios del proyecto. Los antiguos textos de maqueta, incluido `README.txt`, son históricos y no describen el sistema actual.
 
-Para detenerla: Control + C en Terminal.
+## Desarrollo
 
-## Qué incluye
+Configura `.env.local` con las variables del capítulo 10 del manual. No publiques secretos. Una instalación conectada a producción puede modificar sus datos.
 
-- Portada conceptual y responsive.
-- About Maderas del mundo.
-- Catálogo de 6 especies de demostración.
-- Ficha individual para cada madera.
-- Área “Mi colección” simulada.
-- Tienda en modo DRAFT, sin pagos.
-- Panel de administración simulado con inventario.
+```bash
+npm ci
+npm run dev
+node --test tests/venta.test.mjs
+npm run build
+```
 
-## Siguiente fase prevista
-
-- PostgreSQL / Supabase.
-- Registro y login real.
-- Colecciones por usuario.
-- Inventario real.
-- Códigos de barras / QR y activación de muestras físicas.
-- Pedidos y Stripe Checkout.
-- Panel admin operativo.
-- Fotografías reales de las muestras.
+`docs/condiciones-venta.sql` conserva una migración ya aplicada; no debe ejecutarse de nuevo completa. El repositorio no contiene un único instalador que reconstruya todas las funciones y tablas de Supabase. Conserva copias del esquema, datos, configuración y objetos de Storage.
