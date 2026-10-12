@@ -12,3 +12,4 @@ imagenes-sin-encontrar.txt
 # Entorno y exportaciones locales del manual
 .venv-manual/
 manual-exportado/
+qr-exportados/

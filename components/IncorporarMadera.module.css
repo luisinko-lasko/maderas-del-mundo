@@ -1,0 +1,7 @@
+.panel { display:grid; grid-template-columns:minmax(180px,280px) minmax(0,1fr); gap:48px; max-width:950px; margin:36px auto; align-items:center; }
+.imagen { width:100%; aspect-ratio:2 / 3; object-fit:contain; background:rgba(23,37,28,.05); }
+.panel h1 { font-size:clamp(32px,5vw,56px); }
+.acciones { display:flex; flex-direction:column; align-items:flex-start; gap:16px; margin:28px 0; }
+.acciones p { margin:0; }
+.ficha { margin-top:32px; }
+@media(max-width:650px) { .panel { grid-template-columns:1fr; gap:24px; } .imagen { max-width:200px; margin:auto; } .acciones .button { width:100%; } }

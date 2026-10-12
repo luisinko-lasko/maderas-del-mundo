@@ -152,6 +152,8 @@ export default async function Ficha({ params }) {
           </div>
         )}
 
+        <p><Link href={`/coleccion/anadir/${m.xilo_id}`} className="text-link">La tengo · Añadir a mi colección →</Link></p>
+
         <dl className="facts ficha-identidad">
 
           <Fact label="Nombre en inglés" value={m.nombre_ingles} />

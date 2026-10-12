@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { vaciarCarrito } from '../../lib/carrito';
+import { destinoColeccion } from '../../lib/coleccion-retorno';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,6 +93,8 @@ export default function LoginPage() {
       setUser(usuario);
 
       if (usuario) {
+        const destino = destinoColeccion(new URLSearchParams(window.location.search).get('madera')) || destinoColeccion(usuario.user_metadata?.mdm_madera_pendiente);
+        if (destino) { router.replace(destino); return; }
         await cargarDatosUsuario(usuario);
       }
 
@@ -99,7 +104,7 @@ export default function LoginPage() {
     cargarUsuario();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         const usuario = session?.user || null;
         setUser(usuario);
 
@@ -109,12 +114,16 @@ export default function LoginPage() {
           return;
         }
 
-        await cargarDatosUsuario(usuario);
+        setTimeout(() => {
+          const destino = destinoColeccion(new URLSearchParams(window.location.search).get('madera')) || destinoColeccion(usuario.user_metadata?.mdm_madera_pendiente);
+          if (destino) router.replace(destino);
+          else cargarDatosUsuario(usuario);
+        }, 0);
       }
     );
 
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [router]);
 
   async function entrar(e) {
     e.preventDefault();
@@ -472,7 +481,7 @@ export default function LoginPage() {
       </form>
 
       <p style={{ marginTop: '22px' }}>
-        ¿No tienes cuenta? <Link href="/crear-cuenta">Crear cuenta</Link>
+        ¿No tienes cuenta? <Link href={typeof window !== 'undefined' && destinoColeccion(new URLSearchParams(window.location.search).get('madera')) ? `/crear-cuenta?madera=${new URLSearchParams(window.location.search).get('madera')}` : '/crear-cuenta'}>Crear cuenta</Link>
       </p>
 
       {mensaje && (

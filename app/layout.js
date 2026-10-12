@@ -10,6 +10,7 @@ import AuthRecoveryRedirect from '../components/AuthRecoveryRedirect';
 import GuestOrderLinker from '../components/GuestOrderLinker';
 import MobileMenu from '../components/MobileMenu';
 import PublicBanner from '../components/PublicBanner';
+import RetornoColeccionRegistro from '../components/RetornoColeccionRegistro';
 
 export const metadata = {
   title: 'Maderas del mundo',
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       <body>
         <AdminMenuEnhancer />
         <AuthRecoveryRedirect />
+        <RetornoColeccionRegistro />
         <GuestOrderLinker />
 
         <header className="site-header">

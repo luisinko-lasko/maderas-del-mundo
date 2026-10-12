@@ -1,10 +1,10 @@
 # Manual de administración y mantenimiento de Maderas del Mundo
 
-Versión 1 · 11 de octubre de 2026
+Versión 2 · 12 de octubre de 2026
 Responsable del proyecto: Luis Rodríguez
 Web: https://www.maderasdelmundo.es
 Repositorio: https://github.com/luisinko-lasko/maderas-del-mundo
-Estado de referencia del código: 443ea3a, antes de incorporar este manual.
+Estado de referencia del código: d929a37, con la incorporación de QR por especie descrita en esta edición.
 
 Este manual permite administrar el catálogo, las fotografías, el inventario, las ventas y las cuentas, y localizar los cambios técnicos en cada plataforma. Empieza por la tarea que quieras hacer en el capítulo 2. Los capítulos 3 a 8 cubren el trabajo diario; los capítulos 9 a 15 explican código, configuración, publicación y recuperación.
 
@@ -360,7 +360,7 @@ El carrito y el pedido activo se guardan en el navegador con las claves mdm-carr
 
 Una compra de invitado tiene un token aleatorio; la base conserva su hash y no necesita mantener una cuenta ficticia permanente para el comprador. Si más adelante se registra y confirma el mismo correo, vincular_pedidos_invitado asocia los pedidos finalizados y sus especies a su cuenta.
 
-La colección guarda especies distintas por usuario, no cada pieza repetida. Comprar dos piezas de la misma especie no crea dos fichas iguales en Mi colección. El botón de validar códigos o QR sigue deshabilitado como Próximamente: no hay activación pública por QR en esta versión. Para ventas presenciales utiliza el procedimiento administrativo del capítulo 6.
+La colección guarda especies distintas por usuario, no cada pieza repetida. Comprar dos piezas de la misma especie no crea dos fichas iguales en Mi colección. Cada especie tiene un QR que abre /coleccion/anadir/ seguido de su número Xilo. El usuario pulsa Añadir a mi colección y la incorporación se guarda con origen añadida por el usuario. No crea un pedido ni descuenta stock. Una especie ya incorporada muestra Esta madera ya está en tu colección. También se puede quitar desde esa página o desde Mi colección; quitarla no borra una compra. Para registrar una venta presencial con stock e importe sigue utilizando el procedimiento del capítulo 6.
 
 ### 7.5 Cambiar las reglas de venta
 
@@ -383,6 +383,22 @@ docs/condiciones-venta.sql conserva la migración inicial. Ya se aplicó: no eje
 ### 7.6 Casos que deben pasar después de un cambio
 
 Comprueba recogida de una pieza; bloqueo de envío con cuatro; envío de cinco; límite de diez; once; veinte; treinta; bloqueo de treinta y una; códigos de Baleares, Canarias, Ceuta y Melilla; país extranjero; mezcla de piezas y series; caja sin descuento; cancelación y caducidad; importe que llega a Stripe. Un código postal válido no sustituye revisar la dirección física.
+
+### 7.7 QR por especie para el expositor
+
+Cada QR utiliza una dirección estable como https://www.maderasdelmundo.es/coleccion/anadir/1. Está vinculado a xilo_id, no a una pieza física ni al slug. Puedes reutilizarlo para todas las piezas de esa especie y colocarlo junto a ella en el expositor. Las especies nuevas requieren su propio QR.
+
+Escanearlo abre una página con foto, número, nombre, nombre científico y enlace a la ficha completa. Para incorporar la especie hay que pulsar el botón. Un visitante puede entrar o crear una cuenta. La página de login conserva la especie indicada en madera; un nuevo registro guarda temporalmente el número en mdm_madera_pendiente, únicamente para recuperar el destino después de confirmar el correo. No se utiliza ese dato para conceder permisos. Se limpia al llegar a la página de incorporación.
+
+Los QR son públicos: tener un QR no demuestra una compra. Una incorporación manual solo representa que el usuario declara tener esa madera. Las compras y el inventario conservan sus registros por separado. La base permite consultar, añadir y quitar únicamente entradas del usuario autenticado, y su restricción única evita duplicar una especie.
+
+Mi colección muestra Añadida por ti para una incorporación manual y permite Quitar de mi colección con confirmación. El catálogo incluye La tengo · Añadir a mi colección, por lo que no es necesario un lector QR para usar esta función. Una especie oculta o inexistente no puede abrir su página pública.
+
+El paquete de esta edición contiene QR_Especies_Maderas_del_Mundo.pdf, seis hojas A4 con 86 etiquetas, y QR_Especies_Individuales.zip con los SVG y enlaces.csv. Imprime al 100%, conserva el fondo blanco y el margen libre del QR, y prueba la lectura antes de fijar los carteles. Los archivos no necesitan ninguna clave ni incluyen datos de clientes.
+
+Para generar más etiquetas, scripts/generar-qr-especies.py lee un JSON con registros xilo_id y nombre. Exporta primero esos dos campos de maderas publicadas desde Supabase y guarda los registros como JSON. En un entorno Python con reportlab instalado ejecuta python scripts/generar-qr-especies.py --datos especies.json --salida qr-exportados. docs/qr-especies.json conserva el listado de las 86 especies de esta edición y puede usarse como entrada para regenerar este paquete. El script genera el PDF, los SVG y el ZIP con las direcciones del sitio.
+
+El componente de la página es components/IncorporarMadera.js; su estilo está en IncorporarMadera.module.css. La ruta está en app/coleccion/anadir/[xilo]/page.js y la validación del retorno en lib/coleccion-retorno.js. components/RetornoColeccionRegistro.js recupera el destino cuando Auth vuelve a la portada. Para cambiar el diseño, modifica el componente o su CSS; para cambiar las direcciones, conserva redirecciones de las antiguas porque pueden estar ya impresas.
 
 ## 8 Pedidos usuarios y correos
 
@@ -483,6 +499,7 @@ No pegues HTML completo dentro de una página sin respetar JSX. En JSX se usa cl
 | Login y perfil | app/login/page.js |
 | Registro y recuperación | app/crear-cuenta/page.js y app/cambiar-password/page.js |
 | Colección personal | app/coleccion/page.js |
+| Incorporación por QR | app/coleccion/anadir/[xilo]/page.js y components/IncorporarMadera.js |
 | Condiciones y versión aceptada | app/condiciones-compra/page.js y lib/legal.js |
 | Aviso legal y privacidad | app/aviso-legal/page.js y app/privacidad/page.js |
 | Reglas y formato de importes | lib/venta.js y components/ResumenImportes.js |
@@ -722,6 +739,8 @@ En Supabase abre Authentication → Users para revisar una cuenta, y la configur
 
 Revisa que Site URL y las Redirect URLs admitan las rutas correspondientes del origen utilizado: https://www.maderasdelmundo.es y, si se usa, https://maderasdelmundo.es. Añade las rutas locales o de preview necesarias para pruebas, con el alcance mínimo adecuado. Guardar un dominio en Vercel no modifica estas URLs de Auth.
 
+Para un registro iniciado desde un QR, se conserva temporalmente la especie en los metadatos de la cuenta y se recupera al entrar. Si la confirmación vuelve a la portada por la configuración de Auth, la aplicación también recupera ese destino.
+
 Si no llega una confirmación, consulta correo no deseado, registros de Auth y el proveedor de correo configurado. Si el enlace vuelve a una dirección incorrecta, comprueba Redirect URLs y el origen desde el que se solicitó. Si cambias la plantilla, conserva sus variables de confirmación y prueba el enlace completo.
 
 ### 12.2 Localizar las claves de Stripe
@@ -882,7 +901,7 @@ La fuente del manual está en docs/manual-maderas-del-mundo.md y el historial en
 
 1. Identifica los capítulos afectados antes de modificar el sistema.
 2. Cambia sus procedimientos, cifras, nombres y ejemplos según el resultado final.
-3. Incrementa la versión del manual y su fecha; la siguiente edición será Versión 2.
+3. Incrementa la versión del manual y su fecha; la siguiente edición será Versión 3.
 4. Añade al historial el cambio, capítulos, commit o migración y comprobación.
 5. Regenera Word y PDF, revisa la paginación y conserva la edición anterior como referencia histórica.
 6. Guarda documentación y código en el mismo cambio siempre que sea posible.
@@ -906,6 +925,7 @@ La carpeta manual-exportado contendrá Word y PDF, con el número de versión le
 | --- | --- |
 | Hoja, columnas o macro | 2, 3, 4, 11 y errores relacionados |
 | Fotografías o proporciones | 2, 5 y 9 |
+| QR o incorporación personal | 7, 9, 12, 15 y 16 |
 | Inventario, series o cajas | 6, 7, 8 y 11 |
 | Envío, descuentos o condiciones | 7, 8, 9 y 15 |
 | Stripe, claves o webhook | 7, 8, 10, 12 y 14 |
@@ -939,4 +959,6 @@ Los paneles pueden cambiar de nombre o distribución. Usa estos enlaces para con
 
 Versión 1 recoge el catálogo real en Supabase, la sincronización desde MDM, inserción de nuevas especies, PVP con céntimos, 86 fotos verticales, inventario por piezas, series y cajas, ventas presenciales, cuentas y colecciones, compra como invitado, Stripe, Brevo, banners, actualización de dependencias y condiciones de venta del 11 de octubre. Incluye el aviso horizontal del carrito.
 
-La revisión de esta edición contrastó el código de main, cabeceras y primeras filas de MDM, estructura y funciones de la base, bucket de fotografías y reglas de venta. Las claves reales se consultan en sus paneles. Antes de una venta o cambio de configuración, utiliza las comprobaciones de modo Stripe, entornos y Auth descritas en los capítulos correspondientes.
+La versión 2 añade QR públicos por especie, incorporación manual, retorno desde login y registro, eliminación con confirmación y etiquetas imprimibles. La versión 1 se conserva en docs/manual-version-1.md.
+
+La revisión inicial contrastó el código de main, cabeceras y primeras filas de MDM, estructura y funciones de la base, bucket de fotografías y reglas de venta. Las claves reales se consultan en sus paneles. Antes de una venta o cambio de configuración, utiliza las comprobaciones de modo Stripe, entornos y Auth descritas en los capítulos correspondientes.

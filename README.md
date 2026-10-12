@@ -4,7 +4,7 @@ Aplicación de catálogo, tienda y administración de la Asociación Maderas del
 
 ## Manual vigente
 
-[Manual de administración y mantenimiento — Versión 1](docs/manual-maderas-del-mundo.md) describe plataformas, hoja MDM, macros, fotos, inventario, series, compras, usuarios, despliegue, copias y resolución de errores. [Historial del manual](docs/manual-historial.md).
+[Manual de administración y mantenimiento — Versión 2](docs/manual-maderas-del-mundo.md) describe plataformas, hoja MDM, macros, fotos, inventario, series, compras, usuarios, despliegue, copias y resolución de errores. [Historial del manual](docs/manual-historial.md).
 
 `AGENTS.md` exige actualizar los capítulos afectados junto con los cambios del proyecto. Los antiguos textos de maqueta, incluido `README.txt`, son históricos y no describen el sistema actual.
 

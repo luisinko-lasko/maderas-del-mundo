@@ -8,7 +8,7 @@ Antes de dar por terminado un cambio de código, datos, reglas comerciales, esqu
 
 1. Leer las secciones afectadas del manual y contrastarlas con el estado final.
 2. Actualizar procedimientos, cifras, rutas, nombres y ejemplos que cambien. Si el cambio no altera las instrucciones, registrar el cambio y su comprobación en el historial.
-3. Incrementar la versión de la edición cuando cambie el contenido del manual y actualizar la fecha. La edición inicial es Versión 1; la siguiente es Versión 2.
+3. Incrementar la versión de la edición cuando cambie el contenido del manual y actualizar la fecha. La versión vigente figura en la cabecera del manual; la siguiente edición incrementa ese número en uno.
 4. Registrar capítulos afectados, commit o migración y comprobaciones en el historial.
 5. Regenerar y entregar Word y PDF cuando cambie el manual. Sustituir el documento vigente conservando historial, y guardar una copia de la edición anterior cuando corresponda.
 6. Incluir la documentación en el mismo cambio del repositorio cuando sea posible. Informar de un bloqueo real si impide actualizar una copia; no afirmar que se actualizó sin hacerlo.

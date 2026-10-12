@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { numeroEspecie, destinoColeccion } from '../../lib/coleccion-retorno';
 
 export default function CrearCuentaPage() {
   const router = useRouter();
@@ -13,6 +14,13 @@ export default function CrearCuentaPage() {
   const [mensaje, setMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [correoEnviado, setCorreoEnviado] = useState(false);
+  const [madera, setMadera] = useState(null);
+  const [compra, setCompra] = useState(false);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    setMadera(numeroEspecie(query.get('madera')));
+    setCompra(query.get('origen') === 'compra');
+  }, []);
 
   function vieneDeCompra() {
     if (typeof window === 'undefined') return false;
@@ -35,12 +43,14 @@ export default function CrearCuentaPage() {
 
     setEnviando(true);
     const compra = vieneDeCompra();
-    const destino = compra ? '/continuar-compra' : '/login';
+    const madera = numeroEspecie(new URLSearchParams(window.location.search).get('madera'));
+    const destino = madera ? `/login?madera=${madera}` : compra ? '/continuar-compra' : '/login';
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        data: madera ? { mdm_madera_pendiente: madera } : {},
         emailRedirectTo: `${window.location.origin}${destino}`
       }
     });
@@ -52,7 +62,7 @@ export default function CrearCuentaPage() {
     }
 
     if (data?.session) {
-      router.replace(destino);
+      router.replace(destinoColeccion(madera) || destino);
       return;
     }
 
@@ -60,8 +70,7 @@ export default function CrearCuentaPage() {
     setEnviando(false);
   }
 
-  const compra = typeof window !== 'undefined' && vieneDeCompra();
-  const volverHref = compra ? '/continuar-compra' : '/login';
+  const volverHref = madera ? `/login?madera=${madera}` : compra ? '/continuar-compra' : '/login';
 
   if (correoEnviado) {
     return (

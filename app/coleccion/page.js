@@ -10,6 +10,7 @@ export default function Coleccion() {
   const [maderas, setMaderas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [quitando, setQuitando] = useState(null);
   const [criterioOrden, setCriterioOrden] = useState('fecha');
   const [direccionOrden, setDireccionOrden] = useState('desc');
 
@@ -57,6 +58,16 @@ export default function Coleccion() {
 
     cargarColeccion();
   }, []);
+
+  async function quitarMadera(item) {
+    if (!user || quitando || !window.confirm(`¿Quitar ${item.madera?.nombre} de tu colección?`)) return;
+    setQuitando(item.id); setError(null);
+    const { error: quitarError } = await supabase.from('coleccion_usuario').delete()
+      .eq('id', item.id).eq('user_id', user.id);
+    if (quitarError) setError(quitarError.message);
+    else setMaderas(actual => actual.filter(m => m.id !== item.id));
+    setQuitando(null);
+  }
 
   const maderasOrdenadas = useMemo(() => {
     const copia = [...maderas];
@@ -239,6 +250,7 @@ export default function Coleccion() {
             if (!m) return null;
 
             return (
+              <article key={item.id}>
               <Link
                 href={`/catalogo/${m.slug}`}
                 className={styles.collectionCard}
@@ -261,9 +273,13 @@ export default function Coleccion() {
                     <strong>{m.nombre}</strong>
                     <em>{m.nombre_cientifico}</em>
                   </div>
-                  <small>En colección ✓</small>
+                  <small>{item.origen === 'añadida por el usuario' ? 'Añadida por ti' : 'En colección ✓'}</small>
                 </div>
               </Link>
+              <button className="button" style={{marginTop:'10px',fontSize:'12px'}} disabled={Boolean(quitando)} onClick={() => quitarMadera(item)}>
+                {quitando === item.id ? 'Quitando…' : 'Quitar de mi colección'}
+              </button>
+              </article>
             );
           })}
         </div>
@@ -271,17 +287,11 @@ export default function Coleccion() {
 
       <div className="add-code">
         <div>
-          <span>Añadir una pieza física</span>
-          <h2>¿Has comprado una pieza en persona?</h2>
-          <p>
-            Próximamente podrás escanear el código QR de una pieza y añadirla
-            automáticamente a tu colección.
-          </p>
+          <span>Añadir una madera</span>
+          <h2>¿Tienes otras maderas?</h2>
+          <p>Escanea el QR de la especie en nuestro expositor o elige su ficha en el catálogo. Pulsa «Añadir a mi colección» para incorporarla.</p>
         </div>
-
-        <div className="fake-input">
-          MDM-____ <button disabled>Validar</button>
-        </div>
+        <Link className="button" href="/catalogo">Elegir una madera</Link>
       </div>
     </main>
   );
